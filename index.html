@@ -1,0 +1,969 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Globe Studio</title>
+<style>
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: #f0e6d6;
+  --bg: #f0e6d6; --panel: #faf3e6; --panel2: #f1e4ce; --ink: #3c1e0e; --muted: #8b5e3c;
+  --line: rgba(92,58,30,0.28); --chip: #e8d5b7; --accent: #8b5e3c; --danger: #9c3b22;
+}
+body[data-theme="dark"] {
+  background: #1f1210;
+  --bg: #1f1210; --panel: #2a1a12; --panel2: #34211653; --ink: #f0e2cd; --muted: #c4956a;
+  --line: rgba(228,205,167,0.2); --chip: #3a2519; --accent: #c4956a; --danger: #e07a5f;
+}
+input, select, button, textarea { font-family: inherit; }
+input[type="color"] { -webkit-appearance: none; appearance: none; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 5px; }
+</style>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</helmet>
+<div style="position: fixed; inset: 0; overflow: hidden; font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif; color: var(--ink); background: var(--bg);">
+
+  <div ref="{{ chartDivRef }}" style="position: absolute; inset: 0;"></div>
+
+  <!-- Top toolbar -->
+  <div style="position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 10;">
+    <button onClick="{{ onToggleDrawer }}" style="padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 4px rgba(60,30,14,0.12);" style-hover="background: var(--chip);">â˜°&nbsp; Globes</button>
+  </div>
+  <div style="position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10;">
+    <button onClick="{{ onToggleDark }}" style="padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ themeLabel }}</button>
+    <button onClick="{{ onToggleSpin }}" style="{{ spinBtnStyle }}" style-hover="background: var(--chip);">{{ spinLabel }}</button>
+    <button onClick="{{ onToggleProj }}" style="padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ projLabel }}</button>
+    <button onClick="{{ onToggleEdit }}" style="padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;">{{ editLabel }}</button>
+  </div>
+
+  <!-- Role legend (view mode) -->
+  <sc-if value="{{ showLegend }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 16px; bottom: 16px; z-index: 5; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 6px rgba(60,30,14,0.12);">
+      <sc-for list="{{ rolesVm }}" as="r" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="{{ r.swatchStyle }}"></span>
+          <span style="font-size: 12px; color: var(--ink);">{{ r.name }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- Placing hint -->
+  <sc-if value="{{ placingHint }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 16px; z-index: 30; background: var(--ink); color: var(--bg); padding: 9px 18px; border-radius: 999px; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.25);">{{ placingHint }}</div>
+  </sc-if>
+
+  <!-- Library drawer -->
+  <div style="{{ drawerStyle }}">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 10px 16px; border-bottom: 1px solid var(--line);">
+      <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700;">Saved globes</div>
+      <button onClick="{{ onToggleDrawer }}" style="border: none; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 4px;">âœ•</button>
+    </div>
+    <div style="flex: 1; overflow: auto; padding: 12px;">
+      <sc-for list="{{ docsVm }}" as="d" hint-placeholder-count="2">
+        <div data-id="{{ d.id }}" onClick="{{ onSelectDoc }}" style="{{ d.cardStyle }}" style-hover="border-color: var(--accent);">
+          <div style="font-family: Georgia, serif; font-size: 15px; font-weight: 700;">{{ d.name }}</div>
+          <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">{{ d.subtitle }}</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 6px; opacity: 0.8;">{{ d.meta }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <button onClick="{{ onNewDoc }}" style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 12px; font-weight: 600; cursor: pointer;">+ New globe</button>
+      <button onClick="{{ onDuplicateDoc }}" style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer;">Duplicate</button>
+      <button onClick="{{ onExportDoc }}" style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer;">Export JSON</button>
+      <label style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer; text-align: center;">Import JSON<input type="file" accept=".json,application/json" onChange="{{ onImport }}" style="display: none;"></label>
+      <button onClick="{{ onDeleteDoc }}" style="grid-column: 1 / -1; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--danger); font-size: 12px; cursor: pointer;">Delete this globe</button>
+    </div>
+  </div>
+
+  <!-- Editor panel -->
+  <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; top: 60px; right: 14px; bottom: 14px; width: 350px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; z-index: 15; display: flex; flex-direction: column; box-shadow: 0 4px 24px rgba(30,15,5,0.18); overflow: hidden;">
+      <div style="padding: 14px 14px 10px 14px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px;">
+        <input value="{{ docName }}" data-field="name" onInput="{{ onDocField }}" placeholder="Globe title" style="padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 15px; font-weight: 700; font-family: Georgia, serif; width: 100%; box-sizing: border-box;">
+        <div style="display: flex; gap: 8px;">
+          <input value="{{ docSubtitle }}" data-field="subtitle" onInput="{{ onDocField }}" placeholder="Subtitle" style="flex: 1; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 12px; min-width: 0;">
+          <input value="{{ docUnit }}" data-field="unit" onInput="{{ onDocField }}" placeholder="Unit" title="Unit shown in tooltips, e.g. k tonnes" style="width: 90px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 12px;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px; padding: 10px 14px 0 14px;">
+        <button data-tab="countries" onClick="{{ onSetTab }}" style="{{ tabCountriesStyle }}">Countries</button>
+        <button data-tab="flows" onClick="{{ onSetTab }}" style="{{ tabFlowsStyle }}">Connections</button>
+        <button data-tab="markers" onClick="{{ onSetTab }}" style="{{ tabMarkersStyle }}">Markers</button>
+      </div>
+
+      <div style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+
+        <sc-if value="{{ tabIsCountries }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Roles</div>
+            <sc-for list="{{ rolesVm }}" as="r" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="color" value="{{ r.color }}" data-id="{{ r.id }}" data-field="color" onInput="{{ onRoleField }}" style="width: 30px; height: 28px; border: none; background: none; padding: 0; cursor: pointer;">
+                <input value="{{ r.name }}" data-id="{{ r.id }}" data-field="name" onInput="{{ onRoleField }}" style="flex: 1; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px; min-width: 0;">
+                <button data-id="{{ r.id }}" onClick="{{ onDeleteRole }}" title="Delete role" style="border: none; background: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 2px 4px;">âœ•</button>
+              </div>
+            </sc-for>
+            <button onClick="{{ onAddRole }}" style="align-self: flex-start; padding: 5px 10px; border: 1px dashed var(--line); border-radius: 8px; background: none; color: var(--muted); font-size: 12px; cursor: pointer;">+ Add role</button>
+
+            <div style="height: 1px; background: var(--line); margin: 4px 0;"></div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Assign countries</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <select value="{{ paintValue }}" onChange="{{ onPaint }}" style="flex: 1; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 12px;">
+                <sc-for list="{{ paintOptions }}" as="p" hint-placeholder-count="3">
+                  <option value="{{ p.value }}">{{ p.label }}</option>
+                </sc-for>
+              </select>
+              <sc-if value="{{ paintIsCustom }}" hint-placeholder-val="{{ false }}">
+                <input type="color" value="{{ customColor }}" onInput="{{ onCustomColor }}" style="width: 32px; height: 30px; border: none; background: none; padding: 0; cursor: pointer;">
+              </sc-if>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">Click countries on the globe to apply, or search below. Clicking an assigned country again removes it.</div>
+            <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Search countriesâ€¦" style="padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 12px; width: 100%; box-sizing: border-box;">
+            <sc-for list="{{ searchResults }}" as="c" hint-placeholder-count="0">
+              <button data-id="{{ c.id }}" onClick="{{ onAssignFromList }}" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer; width: 100%;" style-hover="border-color: var(--accent);">
+                <span>{{ c.name }}</span>
+                <span style="font-size: 11px; color: var(--muted);">{{ c.tag }}</span>
+              </button>
+            </sc-for>
+
+            <div style="height: 1px; background: var(--line); margin: 4px 0;"></div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Assigned ({{ assignedCount }})</div>
+            <sc-for list="{{ assignedVm }}" as="a" hint-placeholder-count="0">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="{{ a.swatchStyle }}"></span>
+                <span style="flex: 1; font-size: 12px;">{{ a.name }}</span>
+                <span style="font-size: 11px; color: var(--muted);">{{ a.roleName }}</span>
+                <button data-id="{{ a.id }}" onClick="{{ onUnassign }}" style="border: none; background: none; color: var(--danger); cursor: pointer; font-size: 13px; padding: 2px 4px;">âœ•</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tabIsFlows }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ flowsVm }}" as="f" hint-placeholder-count="2">
+              <div style="border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2);">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <input list="gs-countries" value="{{ f.source }}" data-id="{{ f.id }}" data-field="source" onInput="{{ onFlowField }}" placeholder="From" style="{{ f.sourceStyle }}">
+                  <span style="color: var(--muted); font-size: 12px;">â†’</span>
+                  <input list="gs-countries" value="{{ f.target }}" data-id="{{ f.id }}" data-field="target" onInput="{{ onFlowField }}" placeholder="To" style="{{ f.targetStyle }}">
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="number" value="{{ f.valueStr }}" data-id="{{ f.id }}" data-field="value" onInput="{{ onFlowField }}" title="Flow value (band thickness)" style="width: 64px; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px;">
+                  <input type="color" value="{{ f.colorVal }}" data-id="{{ f.id }}" data-field="color" onInput="{{ onFlowField }}" title="Band color" style="width: 28px; height: 26px; border: none; background: none; padding: 0; cursor: pointer;">
+                  <button data-id="{{ f.id }}" onClick="{{ onClearFlowColor }}" title="Use default color" style="padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--muted); font-size: 11px; cursor: pointer;">auto</button>
+                  <label style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); cursor: pointer; margin-left: auto;">
+                    <input type="checkbox" checked="{{ f.revChecked }}" data-id="{{ f.id }}" onChange="{{ onToggleReverse }}">reverse dots
+                  </label>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button data-id="{{ f.id }}" onClick="{{ onWaypoints }}" style="{{ f.wpBtnStyle }}">{{ f.wpLabel }}</button>
+                  <button data-id="{{ f.id }}" onClick="{{ onClearWaypoints }}" style="padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--muted); font-size: 11px; cursor: pointer;">clear route</button>
+                  <button data-id="{{ f.id }}" onClick="{{ onDeleteFlow }}" style="margin-left: auto; border: none; background: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 2px 4px;">âœ•</button>
+                </div>
+              </div>
+            </sc-for>
+            <button onClick="{{ onAddFlow }}" style="padding: 8px; border: 1px dashed var(--line); border-radius: 8px; background: none; color: var(--muted); font-size: 12px; cursor: pointer;">+ Add connection</button>
+            <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">â€œRouteâ€ lets you click waypoints on the globe so a band follows sea lanes instead of cutting across land.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tabIsMarkers }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ markersVm }}" as="m" hint-placeholder-count="2">
+              <div style="border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2);">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <select value="{{ m.type }}" data-id="{{ m.id }}" data-field="type" onChange="{{ onMarkerField }}" style="padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px;">
+                    <option value="pin">Pin</option>
+                    <option value="dot">Dot</option>
+                    <option value="label">Label</option>
+                  </select>
+                  <input value="{{ m.label }}" data-id="{{ m.id }}" data-field="label" onInput="{{ onMarkerField }}" placeholder="Label" style="flex: 1; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px; min-width: 0;">
+                  <input type="color" value="{{ m.color }}" data-id="{{ m.id }}" data-field="color" onInput="{{ onMarkerField }}" style="width: 28px; height: 26px; border: none; background: none; padding: 0; cursor: pointer;">
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button data-id="{{ m.id }}" onClick="{{ onPlaceMarker }}" style="{{ m.placeBtnStyle }}">{{ m.placeLabel }}</button>
+                  <span style="font-size: 11px; color: var(--muted);">{{ m.coords }}</span>
+                  <button data-id="{{ m.id }}" onClick="{{ onDeleteMarker }}" style="margin-left: auto; border: none; background: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 2px 4px;">âœ•</button>
+                </div>
+              </div>
+            </sc-for>
+            <button onClick="{{ onAddMarker }}" style="padding: 8px; border: 1px dashed var(--line); border-radius: 8px; background: none; color: var(--muted); font-size: 12px; cursor: pointer;">+ Add marker</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <datalist id="gs-countries">
+    <sc-for list="{{ countryOptions }}" as="c" hint-placeholder-count="3">
+      <option value="{{ c.name }}"></option>
+    </sc-for>
+  </datalist>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;maxBandWidth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:2,&quot;min&quot;:1,&quot;max&quot;:6,&quot;step&quot;:0.5,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Globe&quot;},&quot;autoRotate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Globe&quot;},&quot;showGrain&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Globe&quot;}}">
+class Component extends DCLogic {
+  chartDivRef = React.createRef();
+
+  state = {
+    ready: false,
+    docs: [],
+    currentId: null,
+    dark: false,
+    editMode: false,
+    drawerOpen: false,
+    isGlobe: true,
+    tab: 'countries',
+    autoRotate: true,
+    search: '',
+    paint: null,
+    customColor: '#8fae7e',
+    placing: null
+  };
+
+  uid() { return 'x' + Math.random().toString(36).slice(2, 9); }
+
+  seedDocs() {
+    return [
+      {
+        id: 'coffee',
+        name: 'Global Coffee Supply Chain',
+        subtitle: 'Producers â†’ processing hubs â†’ consumer markets',
+        unit: 'k tonnes',
+        roles: [
+          { id: 'producer', name: 'Producers', color: '#8fae7e' },
+          { id: 'hub', name: 'Processing hubs', color: '#c4a878' },
+          { id: 'consumer', name: 'Consumer markets', color: '#ddc8a0' }
+        ],
+        assignments: {
+          BR: { roleId: 'producer' }, VN: { roleId: 'producer' }, CO: { roleId: 'producer' },
+          ET: { roleId: 'producer' }, ID: { roleId: 'producer' }, HN: { roleId: 'producer' },
+          DE: { roleId: 'hub' }, BE: { roleId: 'hub' }, IT: { roleId: 'hub' }, US: { roleId: 'hub' },
+          FR: { roleId: 'consumer' }, PL: { roleId: 'consumer' }, SE: { roleId: 'consumer' },
+          RU: { roleId: 'consumer' }, GB: { roleId: 'consumer' }, NL: { roleId: 'consumer' },
+          GR: { roleId: 'consumer' }, AT: { roleId: 'consumer' }, CA: { roleId: 'consumer' }, JP: { roleId: 'consumer' }
+        },
+        flows: [
+          ['BR','DE',350],['BR','US',450],['BR','IT',200],['VN','DE',200],['VN','BE',150],
+          ['CO','US',250],['CO','DE',80],['ET','DE',60],['ET','BE',40],['ID','US',80],
+          ['HN','DE',60],['HN','BE',40],
+          ['DE','FR',150],['DE','PL',100],['DE','SE',80],['DE','RU',120],['BE','GB',100],
+          ['BE','NL',80],['IT','GR',50],['IT','AT',40],['US','CA',120],['US','JP',80]
+        ].map((f, i) => ({ id: 'cf' + i, source: f[0], target: f[1], value: f[2], color: null, reversed: false, waypoints: [] })),
+        markers: []
+      },
+      {
+        id: 'triangle',
+        name: 'The Atlantic Triangle Trade',
+        subtitle: 'Goods, enslaved people, and raw materials Â· 16thâ€“19th c.',
+        unit: 'voyages (relative)',
+        roles: [
+          { id: 'europe', name: 'European powers', color: '#ddc8a0' },
+          { id: 'africa', name: 'West & Central Africa', color: '#8fae7e' },
+          { id: 'americas', name: 'The Americas', color: '#c98d6e' }
+        ],
+        assignments: {
+          GB: { roleId: 'europe' }, PT: { roleId: 'europe' }, FR: { roleId: 'europe' }, ES: { roleId: 'europe' },
+          GH: { roleId: 'africa' }, SN: { roleId: 'africa' }, NG: { roleId: 'africa' }, BJ: { roleId: 'africa' }, AO: { roleId: 'africa' },
+          BR: { roleId: 'americas' }, JM: { roleId: 'americas' }, HT: { roleId: 'americas' }, CU: { roleId: 'americas' }, US: { roleId: 'americas' }
+        },
+        flows: [
+          { id: 'tt1', source: 'GB', target: 'GH', value: 30, color: null, reversed: false, waypoints: [{ longitude: -14, latitude: 30 }] },
+          { id: 'tt2', source: 'FR', target: 'SN', value: 20, color: null, reversed: false, waypoints: [{ longitude: -12, latitude: 33 }] },
+          { id: 'tt3', source: 'PT', target: 'AO', value: 15, color: null, reversed: false, waypoints: [{ longitude: -12, latitude: 18 }, { longitude: -2, latitude: -6 }] },
+          { id: 'tt4', source: 'GH', target: 'JM', value: 25, color: '#7d3b2d', reversed: false, waypoints: [{ longitude: -30, latitude: 10 }] },
+          { id: 'tt5', source: 'SN', target: 'HT', value: 20, color: '#7d3b2d', reversed: false, waypoints: [{ longitude: -40, latitude: 15 }] },
+          { id: 'tt6', source: 'AO', target: 'BR', value: 25, color: '#7d3b2d', reversed: false, waypoints: [{ longitude: -18, latitude: -14 }] },
+          { id: 'tt7', source: 'BJ', target: 'CU', value: 12, color: '#7d3b2d', reversed: false, waypoints: [{ longitude: -35, latitude: 12 }] },
+          { id: 'tt8', source: 'JM', target: 'GB', value: 20, color: null, reversed: false, waypoints: [{ longitude: -45, latitude: 35 }] },
+          { id: 'tt9', source: 'HT', target: 'FR', value: 14, color: null, reversed: false, waypoints: [{ longitude: -38, latitude: 33 }] },
+          { id: 'tt10', source: 'BR', target: 'PT', value: 18, color: null, reversed: false, waypoints: [{ longitude: -28, latitude: 18 }] },
+          { id: 'tt11', source: 'US', target: 'GB', value: 15, color: null, reversed: false, waypoints: [{ longitude: -42, latitude: 45 }] }
+        ],
+        markers: [
+          { id: 'tm1', type: 'label', label: 'The Middle Passage', color: '#7d3b2d', longitude: -33, latitude: 6 },
+          { id: 'tm2', type: 'pin', label: 'Elmina Castle', color: '#7d3b2d', longitude: -1.35, latitude: 5.08 },
+          { id: 'tm3', type: 'dot', label: 'Liverpool', color: '#8b5e3c', longitude: -2.98, latitude: 53.41 }
+        ]
+      }
+    ];
+  }
+
+  componentDidMount() {
+    this._onKey = (e) => { if (e.key === 'Escape' && this.state.placing) this.setState({ placing: null }); };
+    window.addEventListener('keydown', this._onKey);
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('globe-studio-v1')); } catch (e) {}
+    const docs = (saved && Array.isArray(saved.docs) && saved.docs.length) ? saved.docs : this.seedDocs();
+    const currentId = (saved && saved.currentId && docs.some(d => d.id === saved.currentId)) ? saved.currentId : docs[0].id;
+    const dark = saved ? !!saved.dark : false;
+    document.body.dataset.theme = dark ? 'dark' : 'light';
+    const cur = docs.find(d => d.id === currentId);
+    this.setState({ docs, currentId, dark, autoRotate: this.props.autoRotate ?? true, paint: (cur.roles[0] || {}).id || '__custom' });
+    this.waitForLibs();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._onKey);
+    clearTimeout(this._rt);
+    if (this.root) { this.root.dispose(); this.root = null; }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps && (prevProps.maxBandWidth !== this.props.maxBandWidth || prevProps.autoRotate !== this.props.autoRotate || prevProps.showGrain !== this.props.showGrain)) {
+      this.scheduleRebuild();
+    }
+  }
+
+  waitForLibs() {
+    if (window.am5 && window.am5map && window.am5geodata_worldLow && window.am5themes_Animated && this.chartDivRef.current) {
+      this.buildCountryIndex();
+      this.setState({ ready: true });
+      this.buildChart();
+    } else {
+      setTimeout(() => this.waitForLibs(), 120);
+    }
+  }
+
+  buildCountryIndex() {
+    this.id2name = {}; this.name2id = {}; this.countries = [];
+    window.am5geodata_worldLow.features.forEach((f) => {
+      const id = f.id;
+      const name = f.properties && f.properties.name;
+      if (!id || !name) return;
+      this.id2name[id] = name;
+      this.name2id[name.toLowerCase()] = id;
+      this.countries.push({ id, name });
+    });
+    this.countries.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  resolveCountry(text) {
+    if (!text || !this.id2name) return null;
+    const t = String(text).trim();
+    if (!t) return null;
+    if (/^[A-Za-z]{2}$/.test(t) && this.id2name[t.toUpperCase()]) return t.toUpperCase();
+    const exact = this.name2id[t.toLowerCase()];
+    if (exact) return exact;
+    const pref = this.countries.filter(c => c.name.toLowerCase().startsWith(t.toLowerCase()));
+    return pref.length === 1 ? pref[0].id : null;
+  }
+
+  doc() { return this.state.docs.find(d => d.id === this.state.currentId); }
+
+  commit(patch, rebuild) {
+    this.setState(patch, () => {
+      try {
+        localStorage.setItem('globe-studio-v1', JSON.stringify({
+          docs: this.state.docs, currentId: this.state.currentId, dark: this.state.dark
+        }));
+      } catch (e) {}
+      if (rebuild) this.scheduleRebuild();
+    });
+  }
+
+  mutateDoc(fn) {
+    const docs = this.state.docs.map(d => {
+      if (d.id !== this.state.currentId) return d;
+      const c = JSON.parse(JSON.stringify(d));
+      fn(c);
+      return c;
+    });
+    this.commit({ docs }, true);
+  }
+
+  scheduleRebuild() {
+    clearTimeout(this._rt);
+    this._rt = setTimeout(() => this.buildChart(), 350);
+  }
+
+  hex(h) { return am5.color(parseInt(String(h || '#888888').slice(1), 16)); }
+
+  buildChart() {
+    const div = this.chartDivRef.current;
+    const doc = this.doc();
+    if (!div || !doc || !window.am5map || !this.id2name) return;
+
+    let prev = null;
+    if (this.chart && !this.chart.isDisposed()) {
+      prev = { rx: this.chart.get('rotationX'), ry: this.chart.get('rotationY'), zoom: this.chart.get('zoomLevel') };
+    }
+    if (this.root) { this.root.dispose(); this.root = null; this.chart = null; }
+
+    const dark = this.state.dark;
+    const C = dark
+      ? { bg: 0x1f1210, sea: 0x2b1b13, land: 0x3a2519, landStroke: 0x5c3a1e, grat: 0xc4956a, gratOp: 0.12, node: 0xe8d5b7, nodeStroke: 0x2a1a12, flow: 0xc4956a, bean: 0xe8d5b7, beanStroke: 0xc4956a, text: 0xf0e2cd, sub: 0xc4956a, grain: 0xffffff }
+      : { bg: 0xf0e6d6, sea: 0xede4d4, land: 0xf5ece0, landStroke: 0xc4956a, grat: 0x8b5e3c, gratOp: 0.15, node: 0x3c1e0e, nodeStroke: 0xe8d5b7, flow: 0x8b5e3c, bean: 0x3c1e0e, beanStroke: 0x5c3a1e, text: 0x3c1e0e, sub: 0x8b5e3c, grain: 0x000000 };
+
+    const root = am5.Root.new(div);
+    this.root = root;
+    root.setThemes([am5themes_Animated.new(root)]);
+
+    const bgSettings = { fill: am5.color(C.bg) };
+    if (this.props.showGrain ?? true) {
+      bgSettings.fillPattern = am5.GrainPattern.new(root, { density: 0.4, maxOpacity: 0.07, colors: [am5.color(C.grain)] });
+    }
+    root.container.set('background', am5.Rectangle.new(root, bgSettings));
+
+    const isGlobe = this.state.isGlobe;
+    const chart = root.container.children.push(am5map.MapChart.new(root, {
+      panX: isGlobe ? 'rotateX' : 'translateX',
+      panY: isGlobe ? 'rotateY' : 'translateY',
+      projection: isGlobe ? am5map.geoOrthographic() : am5map.geoMercator(),
+      rotationX: prev ? prev.rx : -15,
+      rotationY: isGlobe ? (prev ? prev.ry : -20) : 0,
+      minZoomLevel: 0.5,
+      zoomLevel: prev ? prev.zoom : (isGlobe ? 0.9 : 1)
+    }));
+    this.chart = chart;
+
+    // Ocean sphere
+    const bgSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
+    bgSeries.mapPolygons.template.setAll({ fill: am5.color(C.sea), fillOpacity: isGlobe ? 1 : 0, strokeOpacity: 0 });
+    bgSeries.data.push({ geometry: am5map.getGeoRectangle(90, 180, -90, -180) });
+
+    // Graticule
+    const grat = chart.series.push(am5map.GraticuleSeries.new(root, {}));
+    grat.mapLines.template.setAll({ stroke: am5.color(C.grat), strokeOpacity: C.gratOp, strokeWidth: 0.5 });
+
+    // Countries
+    const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, { geoJSON: window.am5geodata_worldLow, exclude: ['AQ'] }));
+    polygonSeries.mapPolygons.template.setAll({
+      fill: am5.color(C.land), stroke: am5.color(C.landStroke), strokeWidth: 0.5, strokeOpacity: 0.5,
+      interactive: true, tooltipText: '{name}'
+    });
+    polygonSeries.events.on('datavalidated', () => {
+      am5.array.each(polygonSeries.dataItems, (di) => {
+        const id = di.get('id');
+        const a = doc.assignments[id];
+        if (a) {
+          const col = a.color || (doc.roles.find(r => r.id === a.roleId) || {}).color;
+          if (col) di.get('mapPolygon').setAll({ fill: this.hex(col) });
+        }
+      });
+    });
+    polygonSeries.mapPolygons.template.events.on('click', (ev) => {
+      if (this.state.placing) return;
+      if (!this.state.editMode || this.state.tab !== 'countries') return;
+      const di = ev.target.dataItem;
+      const id = di && di.get('id');
+      if (id) this.assignCountryId(id);
+    });
+
+    // Flows
+    const flowsData = [];
+    doc.flows.forEach((f) => {
+      const sid = this.resolveCountry(f.source);
+      const tid = this.resolveCountry(f.target);
+      const v = parseFloat(f.value);
+      if (!sid || !tid || !(v > 0)) return;
+      const item = { sourceId: sid, targetId: tid, value: v, _flow: f };
+      if (f.waypoints && f.waypoints.length) item.waypoints = f.waypoints;
+      flowsData.push(item);
+    });
+
+    const maxWidth = parseFloat(this.props.maxBandWidth ?? 2) || 2;
+    const sankey = chart.series.push(am5map.MapSankeySeries.new(root, {
+      polygonSeries: polygonSeries, maxWidth: maxWidth, controlPointDistance: 0.4, resolution: 60, nodePadding: 0.3
+    }));
+    const unit = doc.unit ? ' ' + doc.unit : '';
+    sankey.mapPolygons.template.setAll({
+      fill: am5.color(C.flow), fillOpacity: 0.65, strokeOpacity: 0,
+      tooltipText: '{sourceNode.name} â†’ {targetNode.name}\n{value}' + unit
+    });
+    sankey.nodes.mapPolygons.template.setAll({
+      fill: am5.color(C.node), stroke: am5.color(C.nodeStroke), strokeWidth: 1.5,
+      fillOpacity: 0.95, strokeOpacity: 1, tooltipText: '{name}\n{sum}' + unit
+    });
+    sankey.bullets.push(() => am5.Bullet.new(root, {
+      locationX: 0, autoRotate: true,
+      sprite: am5.Graphics.new(root, {
+        svgPath: 'M-4,-2.5 C-4,-5 -1.5,-6.5 1,-6.5 C3.5,-6.5 5,-4.5 5,-2 C5,1 3,3.5 0.5,5 C-0.5,5.7 -1.5,5.7 -2.5,5 C-5,3.5 -6,1 -4,-2.5 Z M-1,-5 C-1,-1 -1,2 -0.5,4.5',
+        fill: am5.color(C.bean), stroke: am5.color(C.beanStroke), strokeWidth: 0.5,
+        centerX: am5.p50, centerY: am5.p50, scale: 0.35, visible: false
+      })
+    }));
+    sankey.data.setAll(flowsData);
+    sankey.events.on('datavalidated', () => {
+      am5.array.each(sankey.nodes.dataItems, (di) => {
+        const id = di.get('id');
+        if (id && this.id2name[id]) di.set('name', this.id2name[id]);
+      });
+      am5.array.each(sankey.dataItems, (di) => {
+        const f = di.dataContext && di.dataContext._flow;
+        if (f && f.color) {
+          const mp = di.get('mapPolygon');
+          if (mp) mp.set('fill', this.hex(f.color));
+        }
+        const rev = !!(f && f.reversed);
+        const bullets = di.bullets;
+        if (bullets) {
+          am5.array.each(bullets, (b) => {
+            const dur = 3000 + Math.random() * 3000;
+            const delay = Math.random() * dur;
+            setTimeout(() => {
+              if (root.isDisposed()) return;
+              const s = b.get('sprite');
+              if (s && !s.isDisposed()) s.set('visible', true);
+              b.animate({ key: 'locationX', from: rev ? 1 : 0, to: rev ? 0 : 1, duration: dur, easing: am5.ease.linear, loops: Infinity });
+            }, delay);
+          });
+        }
+      });
+    });
+
+    // Markers
+    const pts = chart.series.push(am5map.MapPointSeries.new(root, {}));
+    pts.bullets.push((rootArg, series, dataItem) => {
+      const m = dataItem.dataContext || {};
+      const col = this.hex(m.color || '#5c3a1e');
+      const cont = am5.Container.new(root, {});
+      if (m.type === 'dot') {
+        cont.children.push(am5.Circle.new(root, { radius: 5, fill: col, stroke: am5.color(C.nodeStroke), strokeWidth: 1.5 }));
+        if (m.label) cont.children.push(am5.Label.new(root, { text: m.label, fontSize: 11, fontWeight: '600', fill: am5.color(C.text), centerX: am5.p50, y: 6 }));
+      } else if (m.type === 'label') {
+        cont.children.push(am5.Label.new(root, {
+          text: m.label || 'Label', fontSize: 13, fontWeight: '600', fontStyle: 'italic', fill: col,
+          centerX: am5.p50, centerY: am5.p50,
+          background: am5.RoundedRectangle.new(root, { fill: am5.color(C.bg), fillOpacity: 0.7, cornerRadiusTL: 4, cornerRadiusTR: 4, cornerRadiusBL: 4, cornerRadiusBR: 4 })
+        }));
+      } else {
+        cont.children.push(am5.Graphics.new(root, {
+          svgPath: 'M0,0 C-1.5,-4 -8,-7 -8,-14 C-8,-19 -4.4,-23 0,-23 C4.4,-23 8,-19 8,-14 C8,-7 1.5,-4 0,0 Z',
+          fill: col, stroke: am5.color(C.nodeStroke), strokeWidth: 1
+        }));
+        cont.children.push(am5.Circle.new(root, { radius: 3, y: -14, fill: am5.color(C.bg) }));
+        if (m.label) cont.children.push(am5.Label.new(root, { text: m.label, fontSize: 11, fontWeight: '600', fill: am5.color(C.text), centerX: am5.p50, centerY: am5.p100, y: -25 }));
+      }
+      return am5.Bullet.new(root, { sprite: cont });
+    });
+    pts.data.setAll(doc.markers
+      .filter(m => typeof m.longitude === 'number' && typeof m.latitude === 'number')
+      .map(m => Object.assign({ geometry: { type: 'Point', coordinates: [m.longitude, m.latitude] } }, m)));
+
+    // Title
+    const titleCont = chart.children.push(am5.Container.new(root, {
+      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: 16
+    }));
+    titleCont.children.push(am5.Label.new(root, {
+      text: doc.name || '', fontSize: 20, fontWeight: '600', fontFamily: 'Georgia, serif', fill: am5.color(C.text), x: am5.p50, centerX: am5.p50
+    }));
+    if (doc.subtitle) {
+      titleCont.children.push(am5.Label.new(root, {
+        text: doc.subtitle, fontSize: 12, fill: am5.color(C.sub), x: am5.p50, centerX: am5.p50
+      }));
+    }
+
+    // Zoom control
+    const zoomControl = chart.set('zoomControl', am5map.ZoomControl.new(root, {}));
+    zoomControl.homeButton.set('visible', true);
+
+    // Click-to-place (markers & waypoints)
+    chart.chartContainer.events.on('click', (ev) => {
+      const placing = this.state.placing;
+      if (!placing) return;
+      const point = chart.chartContainer.toLocal(ev.point);
+      const geo = chart.invert(point);
+      if (!geo) return;
+      const lon = Math.round(geo.longitude * 100) / 100;
+      const lat = Math.round(geo.latitude * 100) / 100;
+      if (placing.kind === 'marker') {
+        this.setState({ placing: null });
+        this.mutateDoc(d => {
+          const m = d.markers.find(x => x.id === placing.id);
+          if (m) { m.longitude = lon; m.latitude = lat; }
+        });
+      } else if (placing.kind === 'waypoint') {
+        this.mutateDoc(d => {
+          const f = d.flows.find(x => x.id === placing.id);
+          if (f) { f.waypoints = f.waypoints || []; f.waypoints.push({ longitude: lon, latitude: lat }); }
+        });
+      }
+    });
+
+    // Auto-rotate (view mode only)
+    if (isGlobe && this.state.autoRotate && !this.state.editMode) {
+      this.startSpin();
+    }
+    chart.chartContainer.events.on('pointerdown', () => {
+      if (this._spin) { this._spin.stop(); this._spin = null; }
+    });
+
+    if (!this._appeared) { chart.appear(1000, 100); this._appeared = true; }
+  }
+
+  startSpin() {
+    if (!this.chart || this.chart.isDisposed()) return;
+    if (this._spin) return;
+    this._spin = this.chart.animate({
+      key: 'rotationX', from: this.chart.get('rotationX'), to: this.chart.get('rotationX') + 360,
+      duration: 120000, loops: Infinity, easing: am5.ease.linear
+    });
+  }
+  stopSpin() {
+    if (this._spin) { this._spin.stop(); this._spin = null; }
+  }
+  onToggleSpin = () => {
+    const autoRotate = !this.state.autoRotate;
+    this.setState({ autoRotate }, () => {
+      if (autoRotate && this.state.isGlobe && !this.state.editMode) this.startSpin();
+      else this.stopSpin();
+    });
+  };
+
+  // ---------- UI handlers ----------
+  onToggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
+  onToggleDark = () => {
+    const dark = !this.state.dark;
+    document.body.dataset.theme = dark ? 'dark' : 'light';
+    this.commit({ dark }, true);
+  };
+  onToggleProj = () => { this.setState({ isGlobe: !this.state.isGlobe }, () => this.buildChart()); };
+  onToggleEdit = () => { this.setState({ editMode: !this.state.editMode, placing: null }, () => this.buildChart()); };
+  onSetTab = (e) => this.setState({ tab: e.currentTarget.dataset.tab, placing: null });
+  onSearch = (e) => this.setState({ search: e.currentTarget.value });
+  onPaint = (e) => this.setState({ paint: e.currentTarget.value });
+  onCustomColor = (e) => this.setState({ customColor: e.currentTarget.value });
+
+  onSelectDoc = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const d = this.state.docs.find(x => x.id === id);
+    if (!d) return;
+    this._touched = false;
+    this._appeared = false;
+    this.commit({ currentId: id, placing: null, paint: (d.roles[0] || {}).id || '__custom' }, true);
+  };
+
+  onNewDoc = () => {
+    const d = {
+      id: this.uid(), name: 'Untitled globe', subtitle: '', unit: '',
+      roles: [{ id: this.uid(), name: 'Highlight', color: '#8fae7e' }],
+      assignments: {}, flows: [], markers: []
+    };
+    this._appeared = false;
+    this.commit({ docs: this.state.docs.concat([d]), currentId: d.id, editMode: true, paint: d.roles[0].id }, true);
+  };
+
+  onDuplicateDoc = () => {
+    const cur = this.doc();
+    if (!cur) return;
+    const c = JSON.parse(JSON.stringify(cur));
+    c.id = this.uid();
+    c.name = cur.name + ' (copy)';
+    this.commit({ docs: this.state.docs.concat([c]), currentId: c.id }, true);
+  };
+
+  onDeleteDoc = () => {
+    const cur = this.doc();
+    if (!cur) return;
+    if (!window.confirm('Delete "' + cur.name + '"? This cannot be undone.')) return;
+    let docs = this.state.docs.filter(d => d.id !== cur.id);
+    if (!docs.length) docs = this.seedDocs().slice(0, 1);
+    this._appeared = false;
+    this.commit({ docs, currentId: docs[0].id, placing: null }, true);
+  };
+
+  onExportDoc = () => {
+    const cur = this.doc();
+    if (!cur) return;
+    const blob = new Blob([JSON.stringify(cur, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (cur.name || 'globe').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  };
+
+  onImport = (e) => {
+    const file = e.currentTarget.files && e.currentTarget.files[0];
+    e.currentTarget.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        const list = Array.isArray(data) ? data : (Array.isArray(data.docs) ? data.docs : [data]);
+        const cleaned = list.filter(d => d && d.name).map(d => {
+          const c = JSON.parse(JSON.stringify(d));
+          c.id = this.uid();
+          c.roles = c.roles || []; c.assignments = c.assignments || {}; c.flows = c.flows || []; c.markers = c.markers || [];
+          return c;
+        });
+        if (!cleaned.length) { window.alert('No globes found in that file.'); return; }
+        this._appeared = false;
+        this.commit({ docs: this.state.docs.concat(cleaned), currentId: cleaned[0].id }, true);
+      } catch (err) {
+        window.alert('Could not read that file as globe JSON.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  onDocField = (e) => {
+    const field = e.currentTarget.dataset.field;
+    const value = e.currentTarget.value;
+    this.mutateDoc(d => { d[field] = value; });
+  };
+
+  // Roles
+  onAddRole = () => this.mutateDoc(d => { d.roles.push({ id: this.uid(), name: 'New role', color: '#c4a878' }); });
+  onRoleField = (e) => {
+    const { id, field } = e.currentTarget.dataset;
+    const value = e.currentTarget.value;
+    this.mutateDoc(d => { const r = d.roles.find(x => x.id === id); if (r) r[field] = value; });
+  };
+  onDeleteRole = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => {
+      d.roles = d.roles.filter(r => r.id !== id);
+      Object.keys(d.assignments).forEach(k => { if (d.assignments[k].roleId === id) delete d.assignments[k]; });
+    });
+    if (this.state.paint === id) this.setState({ paint: '__clear' });
+  };
+
+  assignCountryId(id) {
+    const p = this.state.paint;
+    if (!p) return;
+    const custom = this.state.customColor;
+    this.mutateDoc(d => {
+      const cur = d.assignments[id];
+      if (p === '__clear') { delete d.assignments[id]; return; }
+      if (p === '__custom') {
+        if (cur && cur.color === custom) delete d.assignments[id];
+        else d.assignments[id] = { color: custom };
+      } else {
+        if (cur && cur.roleId === p) delete d.assignments[id];
+        else d.assignments[id] = { roleId: p };
+      }
+    });
+  }
+  onAssignFromList = (e) => this.assignCountryId(e.currentTarget.dataset.id);
+  onUnassign = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { delete d.assignments[id]; });
+  };
+
+  // Flows
+  onAddFlow = () => this.mutateDoc(d => { d.flows.push({ id: this.uid(), source: '', target: '', value: 100, color: null, reversed: false, waypoints: [] }); });
+  onFlowField = (e) => {
+    const { id, field } = e.currentTarget.dataset;
+    const value = e.currentTarget.value;
+    this.mutateDoc(d => { const f = d.flows.find(x => x.id === id); if (f) f[field] = value; });
+  };
+  onClearFlowColor = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { const f = d.flows.find(x => x.id === id); if (f) f.color = null; });
+  };
+  onToggleReverse = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { const f = d.flows.find(x => x.id === id); if (f) f.reversed = !f.reversed; });
+  };
+  onWaypoints = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const p = this.state.placing;
+    if (p && p.kind === 'waypoint' && p.id === id) this.setState({ placing: null });
+    else this.setState({ placing: { kind: 'waypoint', id } });
+  };
+  onClearWaypoints = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { const f = d.flows.find(x => x.id === id); if (f) f.waypoints = []; });
+  };
+  onDeleteFlow = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { d.flows = d.flows.filter(f => f.id !== id); });
+  };
+
+  // Markers
+  onAddMarker = () => {
+    const id = this.uid();
+    this.mutateDoc(d => { d.markers.push({ id, type: 'pin', label: 'New marker', color: this.state.dark ? '#e8d5b7' : '#5c3a1e' }); });
+    this.setState({ placing: { kind: 'marker', id } });
+  };
+  onMarkerField = (e) => {
+    const { id, field } = e.currentTarget.dataset;
+    const value = e.currentTarget.value;
+    this.mutateDoc(d => { const m = d.markers.find(x => x.id === id); if (m) m[field] = value; });
+  };
+  onPlaceMarker = (e) => {
+    const id = e.currentTarget.dataset.id;
+    const p = this.state.placing;
+    if (p && p.kind === 'marker' && p.id === id) this.setState({ placing: null });
+    else this.setState({ placing: { kind: 'marker', id } });
+  };
+  onDeleteMarker = (e) => {
+    const id = e.currentTarget.dataset.id;
+    this.mutateDoc(d => { d.markers = d.markers.filter(m => m.id !== id); });
+  };
+
+  // ---------- render values ----------
+  renderVals() {
+    const s = this.state;
+    const doc = this.doc() || { name: '', subtitle: '', unit: '', roles: [], assignments: {}, flows: [], markers: [] };
+    const roles = doc.roles || [];
+    const id2name = this.id2name || {};
+    const inputBase = {
+      flex: 1, padding: '6px 8px', borderRadius: '6px', background: 'var(--bg)',
+      color: 'var(--ink)', fontSize: '12px', minWidth: 0, width: '100%', boxSizing: 'border-box'
+    };
+    const tabStyle = (active) => ({
+      flex: 1, padding: '7px 4px', border: '1px solid var(--line)', borderRadius: '8px',
+      background: active ? 'var(--accent)' : 'none', color: active ? 'var(--panel)' : 'var(--muted)',
+      fontSize: '12px', fontWeight: 600, cursor: 'pointer'
+    });
+    const swatch = (color) => ({
+      display: 'inline-block', width: '14px', height: '14px', borderRadius: '4px',
+      background: color, border: '1px solid var(--line)', flexShrink: 0
+    });
+
+    const docsVm = s.docs.map(d => ({
+      id: d.id, name: d.name || 'Untitled', subtitle: d.subtitle || '',
+      meta: (d.flows || []).length + ' connections Â· ' + Object.keys(d.assignments || {}).length + ' countries Â· ' + (d.markers || []).length + ' markers',
+      cardStyle: {
+        padding: '12px 14px', borderRadius: '10px', cursor: 'pointer', marginBottom: '8px',
+        border: '1px solid ' + (d.id === s.currentId ? 'var(--accent)' : 'var(--line)'),
+        background: d.id === s.currentId ? 'var(--chip)' : 'transparent'
+      }
+    }));
+
+    const rolesVm = roles.map(r => ({ id: r.id, name: r.name, color: r.color, swatchStyle: swatch(r.color) }));
+
+    const paintOptions = roles.map(r => ({ value: r.id, label: 'Paint: ' + r.name }))
+      .concat([{ value: '__custom', label: 'Paint: custom color' }, { value: '__clear', label: 'Eraser (clear country)' }]);
+
+    const q = s.search.trim().toLowerCase();
+    const searchResults = (!q || !this.countries) ? [] : this.countries
+      .filter(c => c.name.toLowerCase().includes(q))
+      .slice(0, 10)
+      .map(c => {
+        const a = doc.assignments[c.id];
+        const tag = a ? (a.color ? 'custom' : ((roles.find(r => r.id === a.roleId) || {}).name || '')) : '';
+        return { id: c.id, name: c.name, tag };
+      });
+
+    const assignedVm = Object.keys(doc.assignments).map(id => {
+      const a = doc.assignments[id];
+      const role = roles.find(r => r.id === a.roleId);
+      return {
+        id, name: id2name[id] || id,
+        roleName: a.color ? 'custom' : (role ? role.name : 'â€”'),
+        swatchStyle: swatch(a.color || (role ? role.color : '#999'))
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+
+    const flowsVm = (doc.flows || []).map(f => {
+      const placingThis = s.placing && s.placing.kind === 'waypoint' && s.placing.id === f.id;
+      const okS = !f.source || this.resolveCountry(f.source);
+      const okT = !f.target || this.resolveCountry(f.target);
+      const wpCount = (f.waypoints || []).length;
+      return {
+        id: f.id, source: f.source, target: f.target,
+        sourceStyle: Object.assign({}, inputBase, { border: '1px solid ' + (okS ? 'var(--line)' : 'var(--danger)') }),
+        targetStyle: Object.assign({}, inputBase, { border: '1px solid ' + (okT ? 'var(--line)' : 'var(--danger)') }),
+        valueStr: String(f.value ?? ''),
+        colorVal: f.color || '#8b5e3c',
+        revChecked: !!f.reversed,
+        wpLabel: placingThis ? 'Done routing (' + wpCount + ')' : 'Route viaâ€¦ (' + wpCount + ')',
+        wpBtnStyle: {
+          padding: '5px 9px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer',
+          border: '1px solid ' + (placingThis ? 'var(--accent)' : 'var(--line)'),
+          background: placingThis ? 'var(--accent)' : 'none',
+          color: placingThis ? 'var(--panel)' : 'var(--muted)', fontWeight: 600
+        }
+      };
+    });
+
+    const markersVm = (doc.markers || []).map(m => {
+      const placingThis = s.placing && s.placing.kind === 'marker' && s.placing.id === m.id;
+      const has = typeof m.longitude === 'number';
+      return {
+        id: m.id, type: m.type, label: m.label || '', color: m.color || '#5c3a1e',
+        coords: has ? (m.latitude + 'Â°, ' + m.longitude + 'Â°') : 'not placed yet',
+        placeLabel: placingThis ? 'Click the globeâ€¦' : (has ? 'Move' : 'Place'),
+        placeBtnStyle: {
+          padding: '5px 9px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 600,
+          border: '1px solid ' + (placingThis ? 'var(--accent)' : 'var(--line)'),
+          background: placingThis ? 'var(--accent)' : 'none',
+          color: placingThis ? 'var(--panel)' : 'var(--muted)'
+        }
+      };
+    });
+
+    let placingHint = null;
+    if (s.placing) {
+      placingHint = s.placing.kind === 'marker'
+        ? 'Click the globe to place the marker (Esc to cancel)'
+        : 'Click the globe to add waypoints along this route â€” press Esc or â€œDone routingâ€ to finish';
+    }
+
+    return {
+      chartDivRef: this.chartDivRef,
+      themeLabel: s.dark ? 'Light mode' : 'Dark mode',
+      projLabel: s.isGlobe ? 'Flat map' : 'Globe',
+      spinLabel: s.autoRotate ? 'â¸ Rotation' : 'â–¶ Rotation',
+      spinBtnStyle: {
+        padding: '8px 12px', border: '1px solid var(--line)', borderRadius: '8px',
+        background: s.autoRotate ? 'var(--chip)' : 'var(--panel)', color: 'var(--ink)',
+        fontSize: '13px', cursor: 'pointer', whiteSpace: 'nowrap'
+      },
+      editLabel: s.editMode ? 'Done editing' : 'Edit globe',
+      editMode: s.editMode,
+      drawerStyle: {
+        position: 'absolute', top: 0, left: 0, bottom: 0, width: '300px',
+        background: 'var(--panel)', borderRight: '1px solid var(--line)', zIndex: 20,
+        display: 'flex', flexDirection: 'column',
+        boxShadow: '4px 0 18px rgba(30,15,5,0.15)',
+        left: s.drawerOpen ? '0px' : '-330px',
+        visibility: s.drawerOpen ? 'visible' : 'hidden'
+      },
+      showLegend: !s.editMode && rolesVm.length > 0,
+      placingHint,
+      docsVm, rolesVm, paintOptions, searchResults, assignedVm, flowsVm, markersVm,
+      assignedCount: assignedVm.length,
+      docName: doc.name || '', docSubtitle: doc.subtitle || '', docUnit: doc.unit || '',
+      paintValue: s.paint || '__clear',
+      paintIsCustom: s.paint === '__custom',
+      customColor: s.customColor,
+      search: s.search,
+      tabIsCountries: s.tab === 'countries',
+      tabIsFlows: s.tab === 'flows',
+      tabIsMarkers: s.tab === 'markers',
+      tabCountriesStyle: tabStyle(s.tab === 'countries'),
+      tabFlowsStyle: tabStyle(s.tab === 'flows'),
+      tabMarkersStyle: tabStyle(s.tab === 'markers'),
+      countryOptions: this.countries || [],
+      onToggleDrawer: this.onToggleDrawer, onToggleDark: this.onToggleDark, onToggleProj: this.onToggleProj, onToggleSpin: this.onToggleSpin,
+      onToggleEdit: this.onToggleEdit, onSetTab: this.onSetTab, onSearch: this.onSearch,
+      onPaint: this.onPaint, onCustomColor: this.onCustomColor,
+      onSelectDoc: this.onSelectDoc, onNewDoc: this.onNewDoc, onDuplicateDoc: this.onDuplicateDoc,
+      onDeleteDoc: this.onDeleteDoc, onExportDoc: this.onExportDoc, onImport: this.onImport,
+      onDocField: this.onDocField,
+      onAddRole: this.onAddRole, onRoleField: this.onRoleField, onDeleteRole: this.onDeleteRole,
+      onAssignFromList: this.onAssignFromList, onUnassign: this.onUnassign,
+      onAddFlow: this.onAddFlow, onFlowField: this.onFlowField, onClearFlowColor: this.onClearFlowColor,
+      onToggleReverse: this.onToggleReverse, onWaypoints: this.onWaypoints, onClearWaypoints: this.onClearWaypoints,
+      onDeleteFlow: this.onDeleteFlow,
+      onAddMarker: this.onAddMarker, onMarkerField: this.onMarkerField, onPlaceMarker: this.onPlaceMarker,
+      onDeleteMarker: this.onDeleteMarker
+    };
+  }
+}
+</script>
+</body>
+</html>
+
