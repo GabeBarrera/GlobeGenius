@@ -1,0 +1,635 @@
+{
+  "currentId": "coffee",
+  "dark": false,
+  "docs": [
+    {
+      "id": "coffee",
+      "name": "Global Coffee Supply Chain",
+      "subtitle": "Producers → processing hubs → consumer markets",
+      "unit": "k tonnes",
+      "author": "Globe Studio",
+      "version": "1.0",
+      "yearFrom": 2023,
+      "yearTo": null,
+      "tags": [
+        "trade",
+        "agriculture"
+      ],
+      "sources": [
+        {
+          "id": "cs1",
+          "label": "International Coffee Organization — Trade Statistics",
+          "url": "https://www.ico.org/trade_statistics.asp"
+        },
+        {
+          "id": "cs2",
+          "label": "UN Comtrade — HS 0901 (coffee)",
+          "url": "https://comtradeplus.un.org"
+        }
+      ],
+      "scenes": [],
+      "writeup": "<h2>How coffee moves</h2><p>Most coffee crosses an ocean twice before it is drunk: growers ship <b>green beans</b> to processing hubs, where they are roasted, blended and re-exported to consumer markets.</p><p>Band thickness reflects relative annual volume. Drag the globe to explore, or open the editor to change the data.</p>",
+      "roles": [
+        {
+          "id": "producer",
+          "name": "Producers",
+          "color": "#8fae7e"
+        },
+        {
+          "id": "hub",
+          "name": "Processing hubs",
+          "color": "#c4a878"
+        },
+        {
+          "id": "consumer",
+          "name": "Consumer markets",
+          "color": "#ddc8a0"
+        }
+      ],
+      "assignments": {
+        "BR": {
+          "roleId": "producer"
+        },
+        "VN": {
+          "roleId": "producer"
+        },
+        "CO": {
+          "roleId": "producer"
+        },
+        "ET": {
+          "roleId": "producer"
+        },
+        "ID": {
+          "roleId": "producer"
+        },
+        "HN": {
+          "roleId": "producer"
+        },
+        "DE": {
+          "roleId": "hub"
+        },
+        "BE": {
+          "roleId": "hub"
+        },
+        "IT": {
+          "roleId": "hub"
+        },
+        "US": {
+          "roleId": "hub"
+        },
+        "FR": {
+          "roleId": "consumer"
+        },
+        "PL": {
+          "roleId": "consumer"
+        },
+        "SE": {
+          "roleId": "consumer"
+        },
+        "RU": {
+          "roleId": "consumer"
+        },
+        "GB": {
+          "roleId": "consumer"
+        },
+        "NL": {
+          "roleId": "consumer"
+        },
+        "GR": {
+          "roleId": "consumer"
+        },
+        "AT": {
+          "roleId": "consumer"
+        },
+        "CA": {
+          "roleId": "consumer"
+        },
+        "JP": {
+          "roleId": "consumer"
+        }
+      },
+      "flows": [
+        {
+          "id": "cf0",
+          "source": "BR",
+          "target": "DE",
+          "value": 350,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf1",
+          "source": "BR",
+          "target": "US",
+          "value": 450,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf2",
+          "source": "BR",
+          "target": "IT",
+          "value": 200,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf3",
+          "source": "VN",
+          "target": "DE",
+          "value": 200,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf4",
+          "source": "VN",
+          "target": "BE",
+          "value": 150,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf5",
+          "source": "CO",
+          "target": "US",
+          "value": 250,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf6",
+          "source": "CO",
+          "target": "DE",
+          "value": 80,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf7",
+          "source": "ET",
+          "target": "DE",
+          "value": 60,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf8",
+          "source": "ET",
+          "target": "BE",
+          "value": 40,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf9",
+          "source": "ID",
+          "target": "US",
+          "value": 80,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf10",
+          "source": "HN",
+          "target": "DE",
+          "value": 60,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf11",
+          "source": "HN",
+          "target": "BE",
+          "value": 40,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf12",
+          "source": "DE",
+          "target": "FR",
+          "value": 150,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf13",
+          "source": "DE",
+          "target": "PL",
+          "value": 100,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf14",
+          "source": "DE",
+          "target": "SE",
+          "value": 80,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf15",
+          "source": "DE",
+          "target": "RU",
+          "value": 120,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf16",
+          "source": "BE",
+          "target": "GB",
+          "value": 100,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf17",
+          "source": "BE",
+          "target": "NL",
+          "value": 80,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf18",
+          "source": "IT",
+          "target": "GR",
+          "value": 50,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf19",
+          "source": "IT",
+          "target": "AT",
+          "value": 40,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf20",
+          "source": "US",
+          "target": "CA",
+          "value": 120,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        },
+        {
+          "id": "cf21",
+          "source": "US",
+          "target": "JP",
+          "value": 80,
+          "color": null,
+          "reversed": false,
+          "waypoints": []
+        }
+      ],
+      "markers": []
+    },
+    {
+      "id": "triangle",
+      "name": "The Atlantic Triangle Trade",
+      "subtitle": "Goods, enslaved people, and raw materials · 16th–19th c.",
+      "unit": "voyages (relative)",
+      "author": "Globe Studio",
+      "version": "1.0",
+      "yearFrom": 1514,
+      "yearTo": 1866,
+      "tags": [
+        "history",
+        "trade",
+        "migration"
+      ],
+      "sources": [
+        {
+          "id": "ts1",
+          "label": "SlaveVoyages — Trans-Atlantic Slave Trade Database",
+          "url": "https://www.slavevoyages.org"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "sc1",
+          "name": "Outward passage",
+          "text": "European ships carry manufactured goods — textiles, metalware, guns — south to the West African coast.",
+          "camera": {
+            "rx": 8,
+            "ry": -28,
+            "zoom": 1
+          },
+          "flowIds": [
+            "tt1",
+            "tt2",
+            "tt3"
+          ]
+        },
+        {
+          "id": "sc2",
+          "name": "The Middle Passage",
+          "text": "Enslaved Africans are transported across the Atlantic under brutal conditions. Roughly 12.5 million people were embarked over the trade’s duration.",
+          "camera": {
+            "rx": 30,
+            "ry": -10,
+            "zoom": 1.05
+          },
+          "flowIds": [
+            "tt4",
+            "tt5",
+            "tt6",
+            "tt7"
+          ]
+        },
+        {
+          "id": "sc3",
+          "name": "Return passage",
+          "text": "Sugar, tobacco, cotton and rum flow back to European ports, completing the triangle.",
+          "camera": {
+            "rx": 35,
+            "ry": -32,
+            "zoom": 1
+          },
+          "flowIds": [
+            "tt8",
+            "tt9",
+            "tt10",
+            "tt11"
+          ]
+        }
+      ],
+      "writeup": "<h2>The Atlantic triangle</h2><p>From the 16th to the 19th century, European ships carried manufactured goods to West Africa, enslaved people across the <i>Middle Passage</i> to the Americas, and colonial raw materials back to Europe.</p><p>The darker bands mark the Middle Passage routes.</p>",
+      "roles": [
+        {
+          "id": "europe",
+          "name": "European powers",
+          "color": "#ddc8a0"
+        },
+        {
+          "id": "africa",
+          "name": "West & Central Africa",
+          "color": "#8fae7e"
+        },
+        {
+          "id": "americas",
+          "name": "The Americas",
+          "color": "#c98d6e"
+        }
+      ],
+      "assignments": {
+        "GB": {
+          "roleId": "europe"
+        },
+        "PT": {
+          "roleId": "europe"
+        },
+        "FR": {
+          "roleId": "europe"
+        },
+        "ES": {
+          "roleId": "europe"
+        },
+        "GH": {
+          "roleId": "africa"
+        },
+        "SN": {
+          "roleId": "africa"
+        },
+        "NG": {
+          "roleId": "africa"
+        },
+        "BJ": {
+          "roleId": "africa"
+        },
+        "AO": {
+          "roleId": "africa"
+        },
+        "BR": {
+          "roleId": "americas"
+        },
+        "JM": {
+          "roleId": "americas"
+        },
+        "HT": {
+          "roleId": "americas"
+        },
+        "CU": {
+          "roleId": "americas"
+        },
+        "US": {
+          "roleId": "americas"
+        }
+      },
+      "flows": [
+        {
+          "id": "tt1",
+          "source": "GB",
+          "target": "GH",
+          "value": 30,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -14,
+              "latitude": 30
+            }
+          ]
+        },
+        {
+          "id": "tt2",
+          "source": "FR",
+          "target": "SN",
+          "value": 20,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -12,
+              "latitude": 33
+            }
+          ]
+        },
+        {
+          "id": "tt3",
+          "source": "PT",
+          "target": "AO",
+          "value": 15,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -12,
+              "latitude": 18
+            },
+            {
+              "longitude": -2,
+              "latitude": -6
+            }
+          ]
+        },
+        {
+          "id": "tt4",
+          "source": "GH",
+          "target": "JM",
+          "value": 25,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "note": "Middle Passage route from the Gold Coast to Jamaica, one of the largest disembarkation points in the British Caribbean.",
+          "citation": "SlaveVoyages database",
+          "waypoints": [
+            {
+              "longitude": -30,
+              "latitude": 10
+            }
+          ]
+        },
+        {
+          "id": "tt5",
+          "source": "SN",
+          "target": "HT",
+          "value": 20,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -40,
+              "latitude": 15
+            }
+          ]
+        },
+        {
+          "id": "tt6",
+          "source": "AO",
+          "target": "BR",
+          "value": 25,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -18,
+              "latitude": -14
+            }
+          ]
+        },
+        {
+          "id": "tt7",
+          "source": "BJ",
+          "target": "CU",
+          "value": 12,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -35,
+              "latitude": 12
+            }
+          ]
+        },
+        {
+          "id": "tt8",
+          "source": "JM",
+          "target": "GB",
+          "value": 20,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -45,
+              "latitude": 35
+            }
+          ]
+        },
+        {
+          "id": "tt9",
+          "source": "HT",
+          "target": "FR",
+          "value": 14,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -38,
+              "latitude": 33
+            }
+          ]
+        },
+        {
+          "id": "tt10",
+          "source": "BR",
+          "target": "PT",
+          "value": 18,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -28,
+              "latitude": 18
+            }
+          ]
+        },
+        {
+          "id": "tt11",
+          "source": "US",
+          "target": "GB",
+          "value": 15,
+          "color": null,
+          "reversed": false,
+          "waypoints": [
+            {
+              "longitude": -42,
+              "latitude": 45
+            }
+          ]
+        }
+      ],
+      "markers": [
+        {
+          "id": "tm1",
+          "type": "label",
+          "label": "The Middle Passage",
+          "color": "#7d3b2d",
+          "longitude": -33,
+          "latitude": 6
+        },
+        {
+          "id": "tm2",
+          "type": "pin",
+          "label": "Elmina Castle",
+          "color": "#7d3b2d",
+          "longitude": -1.35,
+          "latitude": 5.08
+        },
+        {
+          "id": "tm3",
+          "type": "dot",
+          "label": "Liverpool",
+          "color": "#8b5e3c",
+          "longitude": -2.98,
+          "latitude": 53.41
+        }
+      ]
+    }
+  ]
+}

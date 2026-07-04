@@ -48,20 +48,33 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
   <div ref="{{ chartDivRef }}" style="position: absolute; inset: 0;"></div>
 
   <!-- Top toolbar -->
-  <div style="position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 10;">
+  <div style="position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 10; align-items: center;">
     <button onClick="{{ onToggleDrawer }}" style="padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 4px rgba(60,30,14,0.12);" style-hover="background: var(--chip);">&#9776;&nbsp; Globes</button>
+    <sc-if value="{{ serverBadgeShow }}" hint-placeholder-val="{{ false }}">
+      <div title="{{ serverBadgeTitle }}" style="{{ serverBadgeStyle }}">
+        <span style="{{ serverDotStyle }}"></span>{{ serverBadgeLabel }}
+      </div>
+    </sc-if>
   </div>
-  <div style="position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10;">
-    <button onClick="{{ onToggleDark }}" style="padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ themeLabel }}</button>
+  <div style="position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; align-items: flex-start;">
     <button onClick="{{ onToggleSpin }}" style="{{ spinBtnStyle }}" style-hover="background: var(--chip);">{{ spinLabel }}</button>
-    <button onClick="{{ onToggleProj }}" style="padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ projLabel }}</button>
-    <button onClick="{{ onToggleTable }}" style="padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">Data</button>
-    <button onClick="{{ onToggleEdit }}" style="padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;">{{ editLabel }}</button>
+    <div style="position: relative;">
+      <button onClick="{{ onToggleMenu }}" title="Menu" style="{{ menuBtnStyle }}" style-hover="background: var(--chip);">&#9776;</button>
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ onCloseMenu }}" style="position: fixed; inset: 0; z-index: 0;"></div>
+        <div style="z-index: 1; position: absolute; top: 44px; right: 0; min-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 6px 24px rgba(30,15,5,0.22);">
+          <button onClick="{{ onToggleEdit }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer;">{{ editLabel }}</button>
+          <button onClick="{{ onToggleTable }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">Data table</button>
+          <button onClick="{{ onToggleProj }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ projLabel }}</button>
+          <button onClick="{{ onToggleDark }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ themeLabel }}</button>
+        </div>
+      </sc-if>
+    </div>
   </div>
 
   <!-- Role legend (view mode) -->
   <sc-if value="{{ showLegend }}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 16px; bottom: 16px; z-index: 5; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 6px rgba(60,30,14,0.12);">
+    <div style="{{ legendStyle }}">
       <sc-for list="{{ rolesVm }}" as="r" hint-placeholder-count="3">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="{{ r.swatchStyle }}"></span>
@@ -69,7 +82,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
         </div>
       </sc-for>
       <sc-if value="{{ showScale }}" hint-placeholder-val="{{ false }}">
-        <div style="height: 1px; background: var(--line); margin: 3px 0;"></div>
+        <div style="{{ legendDividerStyle }}"></div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="{{ scaleMinStyle }}"></span>
           <span style="font-size: 11px; color: var(--muted);">{{ scaleMinLabel }}</span>
@@ -85,6 +98,11 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
   <!-- Placing hint -->
   <sc-if value="{{ placingHint }}" hint-placeholder-val="{{ false }}">
     <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 16px; z-index: 30; background: var(--ink); color: var(--bg); padding: 9px 18px; border-radius: 999px; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.25);">{{ placingHint }}</div>
+  </sc-if>
+
+  <!-- Toast -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 64px; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: 0 2px 12px rgba(0,0,0,0.28); white-space: nowrap;">{{ toast }}</div>
   </sc-if>
 
   <!-- Scene stepper (view mode) -->
@@ -243,10 +261,14 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
 
   <!-- Editor panel -->
   <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; top: 60px; right: 14px; bottom: 14px; width: 350px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; z-index: 15; display: flex; flex-direction: column; box-shadow: 0 4px 24px rgba(30,15,5,0.18); overflow: hidden;">
+    <div style="position: absolute; top: 60px; right: 14px; bottom: 14px; width: min(350px, calc(100vw - 28px)); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; z-index: 15; display: flex; flex-direction: column; box-shadow: 0 4px 24px rgba(30,15,5,0.18); overflow: hidden;">
       <div style="padding: 14px 14px 10px 14px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px;">
         <input value="{{ docName }}" data-field="name" onInput="{{ onDocField }}" placeholder="Globe title" style="padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 15px; font-weight: 700; font-family: Georgia, serif; width: 100%; box-sizing: border-box;">
         <input value="{{ docSubtitle }}" data-field="subtitle" onInput="{{ onDocField }}" placeholder="Subtitle" style="width: 100%; box-sizing: border-box; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font-size: 12px;">
+        <div style="display: flex; gap: 8px;">
+          <button onClick="{{ onSaveEdit }}" style="flex: 1; padding: 9px; border: none; border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer;">Save</button>
+          <button onClick="{{ onDiscardEdit }}" style="flex: 1; padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--danger); font-size: 13px; cursor: pointer;">Discard</button>
+        </div>
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0 14px;">
         <button data-tab="countries" onClick="{{ onSetTab }}" style="{{ tabCountriesStyle }}">Countries</button>
@@ -512,7 +534,11 @@ class Component extends DCLogic {
     tableOpen: false,
     tableSort: { key: 'value', dir: -1 },
     flowInfo: null,
-    activeSceneId: null
+    activeSceneId: null,
+    menuOpen: false,
+    serverOnline: null,
+    toast: null,
+    isNarrow: typeof window !== 'undefined' && window.innerWidth < 640
   };
 
   uid() { return 'x' + Math.random().toString(36).slice(2, 9); }
@@ -605,9 +631,57 @@ class Component extends DCLogic {
   componentDidMount() {
     this._onKey = (e) => { if (e.key === 'Escape' && this.state.placing) this.setState({ placing: null }); };
     window.addEventListener('keydown', this._onKey);
+    this._onResize = () => {
+      const isNarrow = window.innerWidth < 640;
+      if (isNarrow !== this.state.isNarrow) this.setState({ isNarrow }, () => this.scheduleRebuild());
+    };
+    window.addEventListener('resize', this._onResize);
+    this.init();
+  }
+
+  async checkServer() {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 1500);
+      const r = await fetch('api/health', { signal: ctrl.signal, cache: 'no-store' });
+      clearTimeout(t);
+      if (!r.ok) return false;
+      const j = await r.json();
+      return !!(j && j.ok);
+    } catch (e) { return false; }
+  }
+
+  async fetchGlobeData(path) {
+    try {
+      const r = await fetch(path, { cache: 'no-store' });
+      if (!r.ok) return null;
+      const j = await r.json();
+      return (j && Array.isArray(j.docs)) ? j : null;
+    } catch (e) { return null; }
+  }
+
+  async init() {
+    const online = await this.checkServer();
+    this.setState({ serverOnline: online });
+
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem('globe-studio-v1')); } catch (e) {}
-    const docs = (saved && Array.isArray(saved.docs) && saved.docs.length) ? saved.docs : this.seedDocs();
+    const hasLocal = saved && Array.isArray(saved.docs) && saved.docs.length;
+
+    let data = null;
+    if (online) {
+      // Server is the source of truth â€” read the persisted file.
+      data = await this.fetchGlobeData('api/globes');
+    } else if (hasLocal) {
+      // Offline: local edits made in this browser take precedence.
+      data = saved;
+    }
+    if (!data) data = await this.fetchGlobeData('data/globe_data.json');
+    if (!data || !Array.isArray(data.docs) || !data.docs.length) {
+      data = { docs: this.seedDocs(), currentId: null, dark: false };
+    }
+
+    const docs = data.docs;
     docs.forEach(d => {
       if (d.writeup == null) d.writeup = '';
       if (!Array.isArray(d.tags)) d.tags = [];
@@ -627,7 +701,7 @@ class Component extends DCLogic {
         if (!f.dir) f.dir = 'auto';
       });
     });
-    // Backfill archive metadata on the seeded docs for users with pre-existing saves
+    // Backfill archive metadata onto docs saved before those fields existed.
     const seeds = this.seedDocs();
     docs.forEach(d => {
       const seed = seeds.find(x => x.id === d.id);
@@ -647,8 +721,8 @@ class Component extends DCLogic {
         }
       });
     });
-    const currentId = (saved && saved.currentId && docs.some(d => d.id === saved.currentId)) ? saved.currentId : docs[0].id;
-    const dark = saved ? !!saved.dark : false;
+    const currentId = (data.currentId && docs.some(d => d.id === data.currentId)) ? data.currentId : docs[0].id;
+    const dark = !!data.dark;
     document.body.dataset.theme = dark ? 'dark' : 'light';
     const cur = docs.find(d => d.id === currentId);
     this.setState({ docs, currentId, dark, autoRotate: this.props.autoRotate ?? true, paint: (cur.roles[0] || {}).id || '__custom' });
@@ -657,8 +731,11 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this._onKey);
+    window.removeEventListener('resize', this._onResize);
     clearTimeout(this._rt);
     clearTimeout(this._wt);
+    clearTimeout(this._saveT);
+    clearTimeout(this._toastT);
     if (this.root) { this.root.dispose(); this.root = null; }
   }
 
@@ -738,13 +815,43 @@ class Component extends DCLogic {
 
   commit(patch, rebuild) {
     this.setState(patch, () => {
-      try {
-        localStorage.setItem('globe-studio-v1', JSON.stringify({
-          docs: this.state.docs, currentId: this.state.currentId, dark: this.state.dark
-        }));
-      } catch (e) {}
+      // While the editor is open, changes stay in memory until Save is pressed.
+      if (!this.state.editMode) {
+        clearTimeout(this._saveT);
+        this._saveT = setTimeout(() => this.persist(), 300);
+      }
       if (rebuild) this.scheduleRebuild();
     });
+  }
+
+  // Writes the full database to localStorage and, when the Node server is
+  // running, to data/globe_data.json. cb(true|false|null): true = written to
+  // file, false = server error, null = no server (browser-only save).
+  persist(cb) {
+    const payload = { docs: this.state.docs, currentId: this.state.currentId, dark: this.state.dark };
+    try { localStorage.setItem('globe-studio-v1', JSON.stringify(payload)); } catch (e) {}
+    if (this.state.serverOnline) {
+      fetch('api/globes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => { if (cb) cb(r.ok); }).catch(() => { if (cb) cb(false); });
+    } else if (cb) cb(null);
+  }
+
+  toastAfterPersist(msg) {
+    clearTimeout(this._saveT);
+    this.persist((ok) => {
+      if (ok === false) this.showToast('Could not save \u2014 server error');
+      else if (ok === null) this.showToast(msg + ' (this browser only)');
+      else this.showToast(msg);
+    });
+  }
+
+  showToast(msg) {
+    clearTimeout(this._toastT);
+    this.setState({ toast: msg });
+    this._toastT = setTimeout(() => this.setState({ toast: null }), 2600);
   }
 
   mutateDoc(fn, rebuild) {
@@ -1023,21 +1130,26 @@ class Component extends DCLogic {
     }
 
     // Title
+    const narrow = this.state.isNarrow;
+    const scenesBarShown = !this.state.editMode && (doc.scenes || []).length > 0;
+    const legendBarShown = narrow && !this.state.editMode && (doc.roles || []).length > 0;
     const titleCont = chart.children.push(am5.Container.new(root, {
-      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: (!this.state.editMode && (doc.scenes || []).length) ? 110 : 16
+      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: scenesBarShown ? (narrow ? 205 : 110) : (legendBarShown ? 75 : 16)
     }));
     titleCont.children.push(am5.Label.new(root, {
-      text: doc.name || '', fontSize: 20, fontWeight: '600', fontFamily: 'Georgia, serif', fill: am5.color(C.text), x: am5.p50, centerX: am5.p50
+      text: doc.name || '', fontSize: narrow ? 15 : 20, fontWeight: '600', fontFamily: 'Georgia, serif', fill: am5.color(C.text), x: am5.p50, centerX: am5.p50, textAlign: 'center', maxWidth: narrow ? Math.max(220, window.innerWidth - 40) : 10000, oversizedBehavior: 'wrap'
     }));
-    if (doc.subtitle) {
+    if (doc.subtitle && !narrow) {
       titleCont.children.push(am5.Label.new(root, {
         text: doc.subtitle, fontSize: 12, fill: am5.color(C.sub), x: am5.p50, centerX: am5.p50
       }));
     }
 
-    // Zoom control
-    const zoomControl = chart.set('zoomControl', am5map.ZoomControl.new(root, {}));
-    zoomControl.homeButton.set('visible', true);
+    // Zoom control (hidden on small screens; pinch to zoom instead)
+    if (!narrow) {
+      const zoomControl = chart.set('zoomControl', am5map.ZoomControl.new(root, {}));
+      zoomControl.homeButton.set('visible', true);
+    }
 
     // Click-to-place (markers & waypoints)
     chart.chartContainer.events.on('click', (ev) => {
@@ -1101,13 +1213,48 @@ class Component extends DCLogic {
 
   // ---------- UI handlers ----------
   onToggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
+  onToggleMenu = () => this.setState({ menuOpen: !this.state.menuOpen });
+  onCloseMenu = () => this.setState({ menuOpen: false });
   onToggleDark = () => {
     const dark = !this.state.dark;
     document.body.dataset.theme = dark ? 'dark' : 'light';
-    this.commit({ dark }, true);
+    this.commit({ dark, menuOpen: false }, true);
   };
-  onToggleProj = () => { this.setState({ isGlobe: !this.state.isGlobe }, () => this.buildChart()); };
-  onToggleEdit = () => { this.setState({ editMode: !this.state.editMode, placing: null, activeSceneId: null, flowInfo: null, tableOpen: false }, () => this.buildChart()); };
+  onToggleProj = () => { this.setState({ isGlobe: !this.state.isGlobe, menuOpen: false }, () => this.buildChart()); };
+  onToggleEdit = () => {
+    if (this.state.editMode) { this.onSaveEdit(); return; }
+    const doc = this.doc();
+    this._editBackup = doc ? JSON.parse(JSON.stringify(doc)) : null;
+    this._editNew = null;
+    this.setState({ editMode: true, placing: null, activeSceneId: null, flowInfo: null, tableOpen: false, menuOpen: false }, () => this.buildChart());
+  };
+  onSaveEdit = () => {
+    this._editBackup = null;
+    this._editNew = null;
+    this.setState({ editMode: false, placing: null, menuOpen: false }, () => {
+      this.buildChart();
+      this.toastAfterPersist('Changes saved');
+    });
+  };
+  onDiscardEdit = () => {
+    let docs = this.state.docs;
+    let currentId = this.state.currentId;
+    if (this._editNew && currentId === this._editNew) {
+      docs = docs.filter(d => d.id !== this._editNew);
+      if (!docs.length) docs = this.seedDocs().slice(0, 1);
+      currentId = docs[0].id;
+      this._appeared = false;
+    } else if (this._editBackup) {
+      const backup = this._editBackup;
+      docs = docs.map(d => d.id === backup.id ? backup : d);
+    }
+    this._editBackup = null;
+    this._editNew = null;
+    this.setState({ docs, currentId, editMode: false, placing: null }, () => {
+      this.buildChart();
+      this.showToast('Changes discarded');
+    });
+  };
   onSetTab = (e) => this.setState({ tab: e.currentTarget.dataset.tab, placing: null });
   onSearch = (e) => this.setState({ search: e.currentTarget.value });
   onPaint = (e) => this.setState({ paint: e.currentTarget.value });
@@ -1129,6 +1276,8 @@ class Component extends DCLogic {
       assignments: {}, flows: [], markers: []
     };
     this._appeared = false;
+    this._editBackup = null;
+    this._editNew = d.id;
     this.commit({ docs: this.state.docs.concat([d]), currentId: d.id, editMode: true, paint: d.roles[0].id }, true);
   };
 
@@ -1148,7 +1297,12 @@ class Component extends DCLogic {
     let docs = this.state.docs.filter(d => d.id !== cur.id);
     if (!docs.length) docs = this.seedDocs().slice(0, 1);
     this._appeared = false;
-    this.commit({ docs, currentId: docs[0].id, placing: null }, true);
+    this._editBackup = null;
+    this._editNew = null;
+    this.setState({ docs, currentId: docs[0].id, placing: null, editMode: false }, () => {
+      this.scheduleRebuild();
+      this.toastAfterPersist('Globe deleted');
+    });
   };
 
   onExportDoc = () => {
@@ -1395,7 +1549,7 @@ class Component extends DCLogic {
   };
 
   // Data table
-  onToggleTable = () => this.setState({ tableOpen: !this.state.tableOpen, flowInfo: null });
+  onToggleTable = () => this.setState({ tableOpen: !this.state.tableOpen, flowInfo: null, menuOpen: false });
   onSortTable = (e) => {
     const key = e.currentTarget.dataset.key;
     const cur = this.state.tableSort;
@@ -1772,6 +1926,39 @@ class Component extends DCLogic {
       },
       editLabel: s.editMode ? 'Done editing' : 'Edit globe',
       editMode: s.editMode,
+      menuOpen: s.menuOpen, onToggleMenu: this.onToggleMenu, onCloseMenu: this.onCloseMenu,
+      menuBtnStyle: {
+        padding: '8px 12px', border: '1px solid var(--line)', borderRadius: '8px',
+        background: s.menuOpen ? 'var(--chip)' : 'var(--panel)', color: 'var(--ink)',
+        fontSize: '15px', lineHeight: '1', cursor: 'pointer', boxShadow: '0 1px 4px rgba(60,30,14,0.12)'
+      },
+      serverBadgeShow: s.serverOnline !== null,
+      serverBadgeLabel: s.serverOnline ? 'Server Online' : 'Server Offline',
+      serverBadgeTitle: s.serverOnline
+        ? 'Connected to the local Node server \u2014 edits are saved to data/globe_data.json.'
+        : 'No server \u2014 edits are kept in this browser only.',
+      serverBadgeStyle: {
+        display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px',
+        border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)',
+        fontSize: '13px', fontWeight: 600, color: s.serverOnline ? '#1a7f37' : '#8a8a8a',
+        boxShadow: '0 1px 4px rgba(60,30,14,0.12)', whiteSpace: 'nowrap'
+      },
+      serverDotStyle: {
+        width: '8px', height: '8px', borderRadius: '50%',
+        background: s.serverOnline ? '#1a7f37' : '#9a9a9a', flexShrink: 0
+      },
+      toast: s.toast,
+      onSaveEdit: this.onSaveEdit, onDiscardEdit: this.onDiscardEdit,
+      legendStyle: s.isNarrow ? {
+        position: 'absolute', left: '10px', right: '10px', bottom: (!s.editMode && scenes.length > 0) ? '112px' : '12px', zIndex: 5,
+        background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '10px', padding: '7px 10px',
+        display: 'flex', flexWrap: 'wrap', gap: '4px 14px', alignItems: 'center', boxShadow: '0 1px 6px rgba(60,30,14,0.12)'
+      } : {
+        position: 'absolute', left: '16px', bottom: '16px', zIndex: 5,
+        background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '10px', padding: '10px 14px',
+        display: 'flex', flexDirection: 'column', gap: '6px', boxShadow: '0 1px 6px rgba(60,30,14,0.12)'
+      },
+      legendDividerStyle: s.isNarrow ? { width: '1px', alignSelf: 'stretch', background: 'var(--line)' } : { height: '1px', background: 'var(--line)', margin: '3px 0' },
       drawerStyle: {
         position: 'absolute', top: 0, left: 0, bottom: 0, width: '300px',
         background: 'var(--panel)', borderRight: '1px solid var(--line)', zIndex: 20,
