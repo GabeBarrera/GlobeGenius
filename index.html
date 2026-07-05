@@ -37,15 +37,37 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
 .gs-writeup ul, .gs-writeup ol { padding-left: 22px; margin: 0.45em 0; }
 .gs-writeup blockquote { border-left: 3px solid var(--line); margin: 0.6em 0; padding-left: 12px; color: var(--muted); }
 .gs-writeup[contenteditable]:empty::before { content: 'Write about this globe\2026'; color: var(--muted); font-style: italic; }
+@keyframes gs-spin { to { transform: rotate(360deg); } }
+@keyframes gs-progress { from { width: 0%; } to { width: 100%; } }
 </style>
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/plugins/exporting.js"></script>
 </helmet>
 <div style="position: fixed; inset: 0; overflow: hidden; font-family: 'Avenir Next', 'Segoe UI', system-ui, sans-serif; color: var(--ink); background: var(--bg);">
 
   <div ref="{{ chartDivRef }}" style="position: absolute; inset: 0;"></div>
+
+  <!-- Loading / failure overlay -->
+  <sc-if value="{{ loadOverlay }}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; z-index: 55; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
+      <sc-if value="{{ loadFailed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 340px;">
+          <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700;">The map could not load</div>
+          <div style="font-size: 13px; color: var(--muted); line-height: 1.55;">Globe Genius draws its map with a library loaded from the internet. Check your connection, then try again.</div>
+          <button onClick="{{ onRetryLoad }}" style="margin-top: 4px; padding: 10px 24px; border: none; border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer;">Try again</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ loadSpinning }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <div style="width: 34px; height: 34px; border: 3px solid var(--chip); border-top-color: var(--accent); border-radius: 50%; animation: gs-spin 0.9s linear infinite;"></div>
+          <div style="font-size: 13px; color: var(--muted); letter-spacing: 0.04em;">Loading the globe&#8230;</div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
 
   <!-- Top toolbar -->
   <div style="position: absolute; top: 14px; left: 14px; display: flex; gap: 8px; z-index: 10; align-items: center;">
@@ -65,6 +87,8 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
         <div style="z-index: 1; position: absolute; top: 44px; right: 0; min-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 6px 24px rgba(30,15,5,0.22);">
           <button onClick="{{ onToggleEdit }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer;">{{ editLabel }}</button>
           <button onClick="{{ onToggleTable }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">Data table</button>
+          <button onClick="{{ onCopyLink }}" title="Copy a link that opens exactly this globe, scene and camera angle" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">Copy link to view</button>
+          <button onClick="{{ onExportImage }}" title="Download the current view as a PNG image" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">Export image (PNG)</button>
           <button onClick="{{ onToggleProj }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ projLabel }}</button>
           <button onClick="{{ onToggleDark }}" style="text-align: left; padding: 9px 12px; border: none; border-radius: 7px; background: none; color: var(--ink); font-size: 13px; cursor: pointer;" style-hover="background: var(--chip);">{{ themeLabel }}</button>
         </div>
@@ -105,9 +129,17 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
     <div style="position: absolute; left: 50%; transform: translateX(-50%); top: 64px; z-index: 40; background: var(--ink); color: var(--bg); padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: 0 2px 12px rgba(0,0,0,0.28); white-space: nowrap;">{{ toast }}</div>
   </sc-if>
 
-  <!-- Scene stepper (view mode) -->
+  <!-- Bottom-center stack: timeline scrubber + scene stepper (view mode) -->
+  <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; z-index: 11; width: 400px; max-width: 86vw; display: flex; flex-direction: column; align-items: stretch; gap: 8px; pointer-events: none;">
+  <sc-if value="{{ showTimeline }}" hint-placeholder-val="{{ false }}">
+    <div style="pointer-events: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 12px rgba(30,15,5,0.18); box-sizing: border-box;">
+      <span style="font-size: 11px; color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums;">{{ timelineMinLabel }}</span>
+      <input type="range" min="{{ timelineMin }}" max="{{ timelineMax }}" step="1" value="{{ timelineVal }}" onInput="{{ onTimeline }}" title="Scrub through time â€” connections appear as their year is reached" style="flex: 1; min-width: 0; margin: 0; accent-color: var(--accent); cursor: pointer;">
+      <span style="font-size: 12px; font-weight: 700; color: var(--ink); flex-shrink: 0; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums;">{{ timelineLabel }}</span>
+    </div>
+  </sc-if>
   <sc-if value="{{ showScenesBar }}" hint-placeholder-val="{{ false }}">
-    <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; z-index: 11; width: 400px; max-width: 86vw; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 12px rgba(30,15,5,0.18); box-sizing: border-box;">
+    <div style="pointer-events: auto; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 12px rgba(30,15,5,0.18); box-sizing: border-box;">
       <div style="display: flex; align-items: center; gap: 10px;">
         <button onClick="{{ onPrevScene }}" style="width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--ink); font-size: 15px; cursor: pointer; flex-shrink: 0;" style-hover="background: var(--chip);">&#8249;</button>
         <div style="flex: 1; text-align: center; min-width: 0;">
@@ -115,12 +147,15 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
           <div style="font-size: 10px; color: var(--muted); letter-spacing: 0.06em;">{{ scenePos }}</div>
         </div>
         <button onClick="{{ onNextScene }}" style="width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--ink); font-size: 15px; cursor: pointer; flex-shrink: 0;" style-hover="background: var(--chip);">&#8250;</button>
+        <button onClick="{{ onTogglePlay }}" title="{{ playTitle }}" style="{{ playBtnStyle }}" style-hover="border-color: var(--accent);">{{ playLabel }}</button>
       </div>
+      {{ playProgress }}
       <sc-if value="{{ sceneText }}" hint-placeholder-val="{{ false }}">
         <div style="font-size: 12px; line-height: 1.55; color: var(--ink); text-align: center;">{{ sceneText }}</div>
       </sc-if>
     </div>
   </sc-if>
+  </div>
 
   <!-- Connection annotation popover -->
   <sc-if value="{{ flowInfo }}" hint-placeholder-val="{{ false }}">
@@ -361,6 +396,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
                 <div style="display: flex; gap: 6px; align-items: center;">
                   <input type="number" value="{{ f.valueStr }}" data-id="{{ f.id }}" data-field="value" onInput="{{ onFlowField }}" title="Flow value (band thickness)" style="width: 56px; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px; flex-shrink: 0;">
                   <input value="{{ f.unit }}" data-id="{{ f.id }}" data-field="unit" onInput="{{ onFlowField }}" placeholder="unit" title="Unit for this connection, e.g. k tonnes" style="flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px;">
+                  <input type="number" value="{{ f.yearStr }}" data-id="{{ f.id }}" data-field="year" onInput="{{ onFlowField }}" placeholder="year" title="Year this connection appears on the timeline (optional)" style="width: 52px; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 12px; flex-shrink: 0;">
                   <input type="color" value="{{ f.colorVal }}" data-id="{{ f.id }}" data-field="color" onInput="{{ onFlowField }}" title="Band color" style="width: 28px; height: 26px; border: none; background: none; padding: 0; cursor: pointer; flex-shrink: 0;">
                   <button data-id="{{ f.id }}" onClick="{{ onClearFlowColor }}" title="Use default color" style="padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--muted); font-size: 11px; cursor: pointer; flex-shrink: 0;">auto</button>
                 </div>
@@ -522,6 +558,22 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
     </div>
   </sc-if>
 
+  <!-- First-run onboarding -->
+  <sc-if value="{{ showOnboard }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 60; background: rgba(30,15,5,0.45); display: flex; align-items: center; justify-content: center; padding: 18px; box-sizing: border-box;">
+      <div style="{{ onboardCardStyle }}">
+        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 700;">Welcome to Globe Genius</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: baseline;"><span style="{{ onboardGlyphStyle }}">1</span><span style="font-size: 13px; line-height: 1.55;">Drag the globe to explore &mdash; it spins on its own and resumes a little while after you let go.</span></div>
+          <div style="display: flex; gap: 12px; align-items: baseline;"><span style="{{ onboardGlyphStyle }}">2</span><span style="font-size: 13px; line-height: 1.55;"><b>Globes</b> (top left) opens the library of maps &mdash; trade routes, wars, migrations and more.</span></div>
+          <div style="display: flex; gap: 12px; align-items: baseline;"><span style="{{ onboardGlyphStyle }}">3</span><span style="font-size: 13px; line-height: 1.55;">Page through the <b>scenes</b> under the globe (or press &#8592; &#8594;), and use &#9654; to let them play on their own.</span></div>
+          <div style="display: flex; gap: 12px; align-items: baseline;"><span style="{{ onboardGlyphStyle }}">4</span><span style="font-size: 13px; line-height: 1.55;">The <b>About</b> tab on the right edge holds each globe&#8217;s story and sources &mdash; and clicking any band shows its annotation.</span></div>
+        </div>
+        <button onClick="{{ onDismissOnboard }}" style="align-self: flex-end; padding: 10px 24px; border: none; border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 13px; font-weight: 600; cursor: pointer;">Got it</button>
+      </div>
+    </div>
+  </sc-if>
+
   <datalist id="gs-countries">
     <sc-for list="{{ countryOptions }}" as="c" hint-placeholder-count="3">
       <option value="{{ c.name }}"></option>
@@ -564,6 +616,11 @@ class Component extends DCLogic {
     menuOpen: false,
     serverOnline: null,
     toast: null,
+    loadState: 'loading',
+    scenePlaying: false,
+    playTick: 0,
+    timelineYear: null,
+    showOnboard: false,
     isNarrow: typeof window !== 'undefined' && window.innerWidth < 640
   };
 
@@ -680,14 +737,14 @@ class Component extends DCLogic {
           ES: { roleId: 'neutral' }, SE: { roleId: 'neutral' }, CH: { roleId: 'neutral' }, TR: { roleId: 'neutral' }, PT: { roleId: 'neutral' }, IE: { roleId: 'neutral' }
         },
         flows: [
-          { id: 'ww1', source: 'US', target: 'GB', value: 40, color: null, reversed: false, note: 'Atlantic convoys carried the bulk of lend-lease materiel \u2014 over $31B of aid to Britain.', citation: 'US State Dept., lend-lease records', waypoints: [{ longitude: -40, latitude: 48 }] },
-          { id: 'ww2', source: 'US', target: 'RU', value: 25, color: null, reversed: false, note: 'Arctic convoys to Murmansk and Archangel braved U-boats and polar ice to supply the USSR.', citation: 'Imperial War Museums', waypoints: [{ longitude: -25, latitude: 62 }, { longitude: 15, latitude: 72 }] },
-          { id: 'ww3', source: 'US', target: 'AU', value: 15, color: null, reversed: false, dir: 'optimal', note: 'Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.', citation: '', waypoints: [{ longitude: -160, latitude: 5 }] },
-          { id: 'ww4', source: 'DE', target: 'RU', value: 35, color: '#7d3b2d', reversed: false, note: 'Operation Barbarossa, June 1941 \u2014 the largest land invasion in history, with over 3 million Axis troops.', citation: 'The National WWII Museum', waypoints: [] },
-          { id: 'ww5', source: 'JP', target: 'US', value: 20, color: '#7d3b2d', reversed: false, dir: 'optimal', note: 'The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.', citation: 'The National WWII Museum', targetPos: { longitude: -157.95, latitude: 21.34 }, waypoints: [{ longitude: 175, latitude: 30 }] },
-          { id: 'ww6', source: 'GB', target: 'FR', value: 30, color: null, reversed: false, note: 'Operation Overlord \u2014 the D-Day landings in Normandy, 6 June 1944.', citation: 'Imperial War Museums', targetPos: { longitude: -0.88, latitude: 49.4 }, waypoints: [] },
-          { id: 'ww7', source: 'JP', target: 'CN', value: 25, color: '#7d3b2d', reversed: false, note: 'The Second Sino-Japanese War merged into WWII, tying down the bulk of Japan\u2019s army.', citation: '', waypoints: [] },
-          { id: 'ww8', source: 'US', target: 'JP', value: 18, color: null, reversed: false, dir: 'optimal', note: 'The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.', citation: '', waypoints: [{ longitude: 165, latitude: 15 }] }
+          { id: 'ww1', source: 'US', target: 'GB', value: 40, year: 1941, color: null, reversed: false, note: 'Atlantic convoys carried the bulk of lend-lease materiel \u2014 over $31B of aid to Britain.', citation: 'US State Dept., lend-lease records', waypoints: [{ longitude: -40, latitude: 48 }] },
+          { id: 'ww2', source: 'US', target: 'RU', value: 25, year: 1941, color: null, reversed: false, note: 'Arctic convoys to Murmansk and Archangel braved U-boats and polar ice to supply the USSR.', citation: 'Imperial War Museums', waypoints: [{ longitude: -25, latitude: 62 }, { longitude: 15, latitude: 72 }] },
+          { id: 'ww3', source: 'US', target: 'AU', value: 15, year: 1942, color: null, reversed: false, dir: 'optimal', note: 'Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.', citation: '', waypoints: [{ longitude: -160, latitude: 5 }] },
+          { id: 'ww4', source: 'DE', target: 'RU', value: 35, year: 1941, color: '#7d3b2d', reversed: false, note: 'Operation Barbarossa, June 1941 \u2014 the largest land invasion in history, with over 3 million Axis troops.', citation: 'The National WWII Museum', waypoints: [] },
+          { id: 'ww5', source: 'JP', target: 'US', value: 20, year: 1941, color: '#7d3b2d', reversed: false, dir: 'optimal', note: 'The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.', citation: 'The National WWII Museum', targetPos: { longitude: -157.95, latitude: 21.34 }, waypoints: [{ longitude: 175, latitude: 30 }] },
+          { id: 'ww6', source: 'GB', target: 'FR', value: 30, year: 1944, color: null, reversed: false, note: 'Operation Overlord \u2014 the D-Day landings in Normandy, 6 June 1944.', citation: 'Imperial War Museums', targetPos: { longitude: -0.88, latitude: 49.4 }, waypoints: [] },
+          { id: 'ww7', source: 'JP', target: 'CN', value: 25, year: 1939, color: '#7d3b2d', reversed: false, note: 'The Second Sino-Japanese War merged into WWII, tying down the bulk of Japan\u2019s army.', citation: '', waypoints: [] },
+          { id: 'ww8', source: 'US', target: 'JP', value: 18, year: 1943, color: null, reversed: false, dir: 'optimal', note: 'The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.', citation: '', waypoints: [{ longitude: 165, latitude: 15 }] }
         ],
         markers: [
           { id: 'wm1', type: 'pin', label: 'Pearl Harbor', color: '#7d3b2d', longitude: -157.95, latitude: 21.34 },
@@ -722,14 +779,14 @@ class Component extends DCLogic {
           US: { roleId: 'target' }, UA: { roleId: 'target' }, EE: { roleId: 'target' }, GB: { roleId: 'target' }, SA: { roleId: 'target' }
         },
         flows: [
-          { id: 'cy1', source: 'RU', target: 'EE', value: 12, color: null, reversed: false, note: '2007 Estonia DDoS \u2014 banks, ministries and media knocked offline for weeks; NATO founded its cyber defence centre in Tallinn in response.', citation: 'NATO CCDCOE', waypoints: [] },
-          { id: 'cy2', source: 'IL', target: 'IR', value: 18, color: null, reversed: false, note: 'Stuxnet (2010), attributed to a US\u2013Israel operation, physically sabotaged uranium-enrichment centrifuges at Natanz.', citation: 'Symantec W32.Stuxnet dossier', waypoints: [] },
-          { id: 'cy3', source: 'KP', target: 'US', value: 14, color: null, reversed: false, dir: 'optimal', note: 'Sony Pictures hack (2014), attributed by the FBI to North Korea\u2019s Lazarus Group.', citation: 'FBI statement, Dec 2014', waypoints: [{ longitude: 178, latitude: 35 }] },
-          { id: 'cy4', source: 'KP', target: 'GB', value: 15, color: null, reversed: false, note: 'WannaCry ransomware (2017) infected 200,000+ machines in 150 countries, crippling NHS hospitals.', citation: 'UK NCSC', waypoints: [{ longitude: 60, latitude: 55 }] },
-          { id: 'cy5', source: 'RU', target: 'UA', value: 20, color: '#7d3b2d', reversed: false, note: 'NotPetya (2017) \u2014 a wiper disguised as ransomware, spread via Ukrainian tax software; ~$10B in global damages, the costliest cyberattack in history.', citation: 'White House attribution, Feb 2018', waypoints: [] },
-          { id: 'cy6', source: 'RU', target: 'US', value: 16, color: '#7d3b2d', reversed: false, note: 'SolarWinds supply-chain compromise (2020) trojanised software updates, reaching nine US federal agencies.', citation: 'CISA / joint agency statement', waypoints: [{ longitude: -30, latitude: 55 }] },
-          { id: 'cy7', source: 'IR', target: 'SA', value: 13, color: null, reversed: false, note: 'Shamoon (2012) wiped roughly 30,000 Saudi Aramco workstations.', citation: 'Reuters investigation', waypoints: [] },
-          { id: 'cy8', source: 'CN', target: 'US', value: 12, color: null, reversed: false, dir: 'optimal', note: 'OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.', citation: 'US OPM', waypoints: [{ longitude: 178, latitude: 45 }] }
+          { id: 'cy1', source: 'RU', target: 'EE', value: 12, year: 2007, color: null, reversed: false, note: '2007 Estonia DDoS \u2014 banks, ministries and media knocked offline for weeks; NATO founded its cyber defence centre in Tallinn in response.', citation: 'NATO CCDCOE', waypoints: [] },
+          { id: 'cy2', source: 'IL', target: 'IR', value: 18, year: 2010, color: null, reversed: false, note: 'Stuxnet (2010), attributed to a US\u2013Israel operation, physically sabotaged uranium-enrichment centrifuges at Natanz.', citation: 'Symantec W32.Stuxnet dossier', waypoints: [] },
+          { id: 'cy3', source: 'KP', target: 'US', value: 14, year: 2014, color: null, reversed: false, dir: 'optimal', note: 'Sony Pictures hack (2014), attributed by the FBI to North Korea\u2019s Lazarus Group.', citation: 'FBI statement, Dec 2014', waypoints: [{ longitude: 178, latitude: 35 }] },
+          { id: 'cy4', source: 'KP', target: 'GB', value: 15, year: 2017, color: null, reversed: false, note: 'WannaCry ransomware (2017) infected 200,000+ machines in 150 countries, crippling NHS hospitals.', citation: 'UK NCSC', waypoints: [{ longitude: 60, latitude: 55 }] },
+          { id: 'cy5', source: 'RU', target: 'UA', value: 20, year: 2017, color: '#7d3b2d', reversed: false, note: 'NotPetya (2017) \u2014 a wiper disguised as ransomware, spread via Ukrainian tax software; ~$10B in global damages, the costliest cyberattack in history.', citation: 'White House attribution, Feb 2018', waypoints: [] },
+          { id: 'cy6', source: 'RU', target: 'US', value: 16, year: 2020, color: '#7d3b2d', reversed: false, note: 'SolarWinds supply-chain compromise (2020) trojanised software updates, reaching nine US federal agencies.', citation: 'CISA / joint agency statement', waypoints: [{ longitude: -30, latitude: 55 }] },
+          { id: 'cy7', source: 'IR', target: 'SA', value: 13, year: 2012, color: null, reversed: false, note: 'Shamoon (2012) wiped roughly 30,000 Saudi Aramco workstations.', citation: 'Reuters investigation', waypoints: [] },
+          { id: 'cy8', source: 'CN', target: 'US', value: 12, year: 2015, color: null, reversed: false, dir: 'optimal', note: 'OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.', citation: 'US OPM', waypoints: [{ longitude: 178, latitude: 45 }] }
         ],
         markers: [
           { id: 'cm1', type: 'dot', label: 'Morris worm, 1988', color: '#8b5e3c', longitude: -71.09, latitude: 42.36 },
@@ -740,7 +797,20 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    this._onKey = (e) => { if (e.key === 'Escape' && this.state.placing) this.setState({ placing: null }); };
+    this._onKey = (e) => {
+      if (e.key === 'Escape') {
+        if (this.state.placing) { this.setState({ placing: null }); return; }
+        if (this.state.showOnboard) { this.onDismissOnboard(); return; }
+        if (this.state.scenePlaying) { this.stopPlay(); return; }
+        return;
+      }
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      const hasScenes = !this.state.editMode && (((this.doc() || {}).scenes) || []).length > 0;
+      if (e.key === 'ArrowLeft' && hasScenes) { e.preventDefault(); this.stepScene(-1); }
+      else if (e.key === 'ArrowRight' && hasScenes) { e.preventDefault(); this.stepScene(1); }
+      else if (e.key === ' ' && !this.state.editMode) { e.preventDefault(); this.onToggleSpin(); }
+    };
     window.addEventListener('keydown', this._onKey);
     this._onResize = () => {
       const isNarrow = window.innerWidth < 640;
@@ -812,6 +882,7 @@ class Component extends DCLogic {
         if (f.unit == null) f.unit = d.unit || '';
         if (f.sourcePos === undefined) f.sourcePos = null;
         if (f.targetPos === undefined) f.targetPos = null;
+        if (f.year === undefined) f.year = null;
         if (!f.dir) f.dir = 'auto';
       });
     });
@@ -833,17 +904,37 @@ class Component extends DCLogic {
         if (sf) {
           if (!f.note && sf.note) f.note = sf.note;
           if (!f.citation && sf.citation) f.citation = sf.citation;
+          if ((f.year == null || f.year === '') && sf.year != null) f.year = sf.year;
           if ((!f.dir || f.dir === 'auto') && sf.dir && sf.dir !== 'auto') f.dir = sf.dir;
         }
       });
     });
     // Add any built-in globes that this saved database predates.
     seeds.forEach(sd => { if (!docs.some(d => d.id === sd.id)) docs.push(sd); });
-    const currentId = (data.currentId && docs.some(d => d.id === data.currentId)) ? data.currentId : docs[0].id;
+    let currentId = (data.currentId && docs.some(d => d.id === data.currentId)) ? data.currentId : docs[0].id;
     const dark = !!data.dark;
     document.body.dataset.theme = dark ? 'dark' : 'light';
+    // Deep link: #g=<globeId>&s=<scene#>&rx=&ry=&z=&flat=1
+    let isGlobe = true, activeSceneId = null, deepLinked = false;
+    const hp = this.parseHash();
+    if (hp) {
+      if (hp.g && docs.some(d => d.id === hp.g)) currentId = hp.g;
+      if (hp.flat === '1') isGlobe = false;
+      const hd = docs.find(d => d.id === currentId);
+      const si = parseInt(hp.s, 10);
+      if (isFinite(si) && si >= 1 && hd && (hd.scenes || []).length >= si) {
+        const sc = hd.scenes[si - 1];
+        activeSceneId = sc.id;
+        if (sc.camera) { this._camOverride = sc.camera; deepLinked = true; }
+      }
+      if (hp.rx != null || hp.z != null) {
+        this._camOverride = { rx: parseFloat(hp.rx) || 0, ry: parseFloat(hp.ry) || 0, zoom: parseFloat(hp.z) || 1 };
+        deepLinked = true;
+      }
+    }
+    try { this._onboarded = !!localStorage.getItem('globe-genius-onboarded-v1'); } catch (e) { this._onboarded = true; }
     const cur = docs.find(d => d.id === currentId);
-    this.setState({ docs, currentId, dark, autoRotate: this.props.autoRotate ?? true, paint: (cur.roles[0] || {}).id || '__custom' });
+    this.setState({ docs, currentId, dark, isGlobe, activeSceneId, autoRotate: (this.props.autoRotate ?? true) && !deepLinked, paint: (cur.roles[0] || {}).id || '__custom' });
     this.waitForLibs();
   }
 
@@ -852,6 +943,9 @@ class Component extends DCLogic {
     window.removeEventListener('resize', this._onResize);
     clearTimeout(this._rt);
     clearTimeout(this._wt);
+    clearTimeout(this._playT);
+    clearTimeout(this._libT);
+    clearTimeout(this._idleT);
     clearTimeout(this._saveT);
     clearTimeout(this._toastT);
     if (this.root) { this.root.dispose(); this.root = null; }
@@ -888,14 +982,111 @@ class Component extends DCLogic {
   }
 
   waitForLibs() {
+    if (!this._libStart) this._libStart = Date.now();
     if (window.am5 && window.am5map && window.am5geodata_worldLow && window.am5themes_Animated && this.chartDivRef.current) {
       this.buildCountryIndex();
-      this.setState({ ready: true });
+      this.setState({ ready: true, loadState: 'ready', showOnboard: !this._onboarded });
       this.buildChart();
+    } else if (Date.now() - this._libStart > 12000) {
+      this.setState({ loadState: 'failed' });
     } else {
-      setTimeout(() => this.waitForLibs(), 120);
+      clearTimeout(this._libT);
+      this._libT = setTimeout(() => this.waitForLibs(), 120);
     }
   }
+
+  onRetryLoad = () => {
+    this._libStart = Date.now();
+    this.setState({ loadState: 'loading' });
+    const need = [
+      ['am5', 'https://cdn.amcharts.com/lib/5/index.js'],
+      ['am5map', 'https://cdn.amcharts.com/lib/5/map.js'],
+      ['am5geodata_worldLow', 'https://cdn.amcharts.com/lib/5/geodata/worldLow.js'],
+      ['am5themes_Animated', 'https://cdn.amcharts.com/lib/5/themes/Animated.js']
+    ].filter(p => !window[p[0]]);
+    const loadNext = (i) => {
+      if (i >= need.length) return;
+      const sc = document.createElement('script');
+      sc.src = need[i][1];
+      sc.onload = () => loadNext(i + 1);
+      sc.onerror = () => loadNext(i + 1);
+      document.head.appendChild(sc);
+    };
+    loadNext(0);
+    this.waitForLibs();
+  };
+
+  onDismissOnboard = () => {
+    this.setState({ showOnboard: false });
+    this._onboarded = true;
+    try { localStorage.setItem('globe-genius-onboarded-v1', '1'); } catch (e) {}
+  };
+
+  // ---------- deep links ----------
+  parseHash() {
+    const h = (window.location.hash || '').replace(/^#/, '');
+    if (!h) return null;
+    const p = {};
+    h.split('&').forEach(kv => {
+      const i = kv.indexOf('=');
+      if (i > 0) { try { p[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1)); } catch (e) {} }
+    });
+    return p;
+  }
+  updateHash(withCam) {
+    const doc = this.doc();
+    if (!doc) return;
+    const parts = ['g=' + encodeURIComponent(doc.id)];
+    if (this.state.activeSceneId) {
+      const i = (doc.scenes || []).findIndex(x => x.id === this.state.activeSceneId);
+      if (i > -1) parts.push('s=' + (i + 1));
+    }
+    if (!this.state.isGlobe) parts.push('flat=1');
+    if (withCam) {
+      const c = this.cameraNow();
+      if (c) { parts.push('rx=' + c.rx); parts.push('ry=' + c.ry); parts.push('z=' + c.zoom); }
+    }
+    try { history.replaceState(null, '', '#' + parts.join('&')); } catch (e) {}
+  }
+  onCopyLink = () => {
+    this.setState({ menuOpen: false });
+    this.updateHash(true);
+    const url = window.location.href;
+    const fallback = () => { try { window.prompt('Copy this link:', url); } catch (e) {} };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => this.showToast('Link to this view copied'), fallback);
+    } else fallback();
+  };
+
+  onExportImage = () => {
+    this.setState({ menuOpen: false });
+    if (!this.root || this.root.isDisposed() || !window.am5plugins_exporting) { this.showToast('Image export is unavailable'); return; }
+    try {
+      if (!this._exporting || this._exportingRoot !== this.root) {
+        this._exporting = am5plugins_exporting.Exporting.new(this.root, {});
+        this._exportingRoot = this.root;
+      }
+      const doc = this.doc();
+      this._exporting.set('filePrefix', ((doc && doc.name) || 'globe').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase());
+      this._exporting.download('png');
+      this.showToast('Exporting image\u2026');
+    } catch (e) { this.showToast('Could not export image'); }
+  };
+
+  // ---------- timeline ----------
+  timelineInfo() {
+    const doc = this.doc();
+    if (!doc) return null;
+    const ys = (doc.flows || []).map(f => parseFloat(f.year)).filter(v => isFinite(v));
+    if (ys.length < 2) return null;
+    const min = Math.min.apply(null, ys), max = Math.max.apply(null, ys);
+    return max > min ? { min, max } : null;
+  }
+  onTimeline = (e) => {
+    const v = parseInt(e.currentTarget.value, 10);
+    if (!isFinite(v)) return;
+    this.setState({ timelineYear: v }, () => this.scheduleRebuild());
+  };
 
   buildCountryIndex() {
     this.id2name = {}; this.name2id = {}; this.countries = []; this.centroids = {};
@@ -1077,9 +1268,12 @@ class Component extends DCLogic {
     // Flows
     const activeScene0 = (!this.state.editMode && this.state.activeSceneId) ? (doc.scenes || []).find(x => x.id === this.state.activeSceneId) : null;
     const sceneFlowIds = (activeScene0 && activeScene0.flowIds && activeScene0.flowIds.length) ? activeScene0.flowIds : null;
+    const tlInfo0 = !this.state.editMode ? this.timelineInfo() : null;
+    const tlYear = (tlInfo0 && this.state.timelineYear != null) ? Math.max(tlInfo0.min, Math.min(tlInfo0.max, this.state.timelineYear)) : null;
     const flowsData = [];
     doc.flows.forEach((f) => {
       if (sceneFlowIds && sceneFlowIds.indexOf(f.id) === -1) return;
+      if (tlYear != null && tlYear < tlInfo0.max) { const fy = parseFloat(f.year); if (isFinite(fy) && fy > tlYear) return; }
       const sid = this.resolveCountry(f.source);
       const tid = this.resolveCountry(f.target);
       const v = parseFloat(f.value);
@@ -1143,6 +1337,18 @@ class Component extends DCLogic {
       fill: am5.color(C.flow), fillOpacity: 0.65, strokeOpacity: 0,
       interactive: true,
       tooltipText: '{sourceNode.name} \u2192 {targetNode.name}\n{value}'
+    });
+    sankey.mapPolygons.template.events.on('pointerover', (ev) => {
+      am5.array.each(sankey.dataItems, (di) => {
+        const mp = di.get('mapPolygon');
+        if (mp) mp.animate({ key: 'fillOpacity', to: mp === ev.target ? 0.95 : 0.12, duration: 180, easing: am5.ease.out(am5.ease.cubic) });
+      });
+    });
+    sankey.mapPolygons.template.events.on('pointerout', () => {
+      am5.array.each(sankey.dataItems, (di) => {
+        const mp = di.get('mapPolygon');
+        if (mp) mp.animate({ key: 'fillOpacity', to: 0.65, duration: 180, easing: am5.ease.out(am5.ease.cubic) });
+      });
     });
     sankey.mapPolygons.template.events.on('click', (ev) => {
       if (this.state.editMode) return;
@@ -1283,8 +1489,9 @@ class Component extends DCLogic {
     // Title
     const narrow = this.state.isNarrow;
     const scenesBarShown = !this.state.editMode && (doc.scenes || []).length > 0;
+    const timelineShown = !this.state.editMode && !!this.timelineInfo();
     const titleCont = chart.children.push(am5.Container.new(root, {
-      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: scenesBarShown ? (narrow ? 205 : 110) : 16
+      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: (scenesBarShown ? (narrow ? 205 : 110) : 16) + (timelineShown ? 46 : 0)
     }));
     titleCont.children.push(am5.Label.new(root, {
       text: doc.name || '', fontSize: narrow ? 15 : 20, fontWeight: '600', fontFamily: 'Georgia, serif', fill: am5.color(C.text), x: am5.p50, centerX: am5.p50, textAlign: 'center', maxWidth: narrow ? Math.max(220, window.innerWidth - 40) : 10000, oversizedBehavior: 'wrap'
@@ -1335,6 +1542,7 @@ class Component extends DCLogic {
       this.startSpin();
     }
     chart.chartContainer.events.on('pointerdown', () => {
+      this.stopPlay();
       if (this._spin) { this._spin.stop(); this._spin = null; }
       if (this.state.autoRotate) this.setState({ autoRotate: false });
       this.scheduleSpinResume();
@@ -1369,7 +1577,7 @@ class Component extends DCLogic {
     clearTimeout(this._idleT);
     if (this._spinUserPaused) return;
     this._idleT = setTimeout(() => {
-      if (this._spinUserPaused || this.state.editMode || !this.state.isGlobe || this.state.placing) return;
+      if (this._spinUserPaused || this.state.editMode || !this.state.isGlobe || this.state.placing || this.state.scenePlaying) return;
       if (!this.state.autoRotate) this.setState({ autoRotate: true });
       this.startSpin();
     }, 20000);
@@ -1384,9 +1592,10 @@ class Component extends DCLogic {
     document.body.dataset.theme = dark ? 'dark' : 'light';
     this.commit({ dark, menuOpen: false }, true);
   };
-  onToggleProj = () => { this.setState({ isGlobe: !this.state.isGlobe, menuOpen: false }, () => this.buildChart()); };
+  onToggleProj = () => { this.setState({ isGlobe: !this.state.isGlobe, menuOpen: false }, () => { this.buildChart(); this.updateHash(false); }); };
   onToggleEdit = () => {
     if (this.state.editMode) { this.onSaveEdit(); return; }
+    this.stopPlay();
     const doc = this.doc();
     this._editBackup = doc ? JSON.parse(JSON.stringify(doc)) : null;
     this._editNew = null;
@@ -1430,7 +1639,9 @@ class Component extends DCLogic {
     if (!d) return;
     this._touched = false;
     this._appeared = false;
-    this.commit({ currentId: id, placing: null, activeSceneId: null, flowInfo: null, paint: (d.roles[0] || {}).id || '__custom' }, true);
+    this.stopPlay();
+    this.commit({ currentId: id, placing: null, activeSceneId: null, flowInfo: null, timelineYear: null, paint: (d.roles[0] || {}).id || '__custom' }, true);
+    setTimeout(() => this.updateHash(false), 0);
   };
 
   onNewDoc = () => {
@@ -1684,7 +1895,7 @@ class Component extends DCLogic {
     const doc = this.doc();
     const sc = id ? ((doc || {}).scenes || []).find(x => x.id === id) : null;
     if (sc && sc.camera) this._camOverride = sc.camera;
-    this.setState({ activeSceneId: sc ? sc.id : null, flowInfo: null, autoRotate: false }, () => { this.stopSpin(); this.buildChart(); });
+    this.setState({ activeSceneId: sc ? sc.id : null, flowInfo: null, autoRotate: false }, () => { this.stopSpin(); this.buildChart(); this.updateHash(false); });
     this.scheduleSpinResume();
   }
   onPrevScene = () => this.stepScene(-1);
@@ -1695,6 +1906,33 @@ class Component extends DCLogic {
     if (i === -1) i = 0;
     i = (i + dir + ids.length) % ids.length;
     this.activateScene(ids[i]);
+    if (this.state.scenePlaying) {
+      this.setState({ playTick: this.state.playTick + 1 });
+      this.schedulePlayNext();
+    }
+  }
+
+  // Auto-play: step through the scenes on a timer with a progress bar.
+  PLAY_MS = 9000;
+  onTogglePlay = () => {
+    if (this.state.scenePlaying) { this.stopPlay(); return; }
+    this.setState({ scenePlaying: true, playTick: this.state.playTick + 1 });
+    this.stopSpin();
+    this.schedulePlayNext();
+  };
+  schedulePlayNext() {
+    clearTimeout(this._playT);
+    this._playT = setTimeout(() => {
+      if (!this.state.scenePlaying) return;
+      this.stepScene(1);
+    }, this.PLAY_MS);
+  }
+  stopPlay() {
+    clearTimeout(this._playT);
+    if (this.state.scenePlaying) {
+      this.setState({ scenePlaying: false });
+      this.scheduleSpinResume();
+    }
   }
 
   // Archive metadata
@@ -1984,6 +2222,7 @@ class Component extends DCLogic {
       return {
         id: f.id, source: f.source, target: f.target,
         unit: f.unit || '',
+        yearStr: (f.year == null || f.year === '') ? '' : String(f.year),
         dir: f.dir || 'auto',
         srcLat: f.sourcePos ? String(f.sourcePos.latitude) : '',
         srcLon: f.sourcePos ? String(f.sourcePos.longitude) : '',
@@ -2082,6 +2321,10 @@ class Component extends DCLogic {
       out: t.out ? (Math.round(t.out * 100) / 100).toLocaleString() : '\u2014',
       inn: t.inn ? (Math.round(t.inn * 100) / 100).toLocaleString() : '\u2014'
     })).sort((a, b) => a.name.localeCompare(b.name));
+
+    // Timeline (view mode): appears when 2+ connections carry distinct years.
+    const tlInfo = !s.editMode ? this.timelineInfo() : null;
+    const tlVal = tlInfo ? ((s.timelineYear == null) ? tlInfo.max : Math.max(tlInfo.min, Math.min(tlInfo.max, s.timelineYear))) : 0;
 
     let placingHint = null;
     if (s.placing) {
@@ -2234,6 +2477,41 @@ class Component extends DCLogic {
       scaleMinLabel: minV.toLocaleString() + (unit0 ? ' ' + unit0 : ''),
       scaleMaxLabel: maxV.toLocaleString() + (unit0 ? ' ' + unit0 : ''),
       showScenesBar: !s.editMode && scenes.length > 0,
+      showTimeline: !!tlInfo,
+      timelineMin: tlInfo ? tlInfo.min : 0,
+      timelineMax: tlInfo ? tlInfo.max : 1,
+      timelineVal: tlVal,
+      timelineMinLabel: tlInfo ? String(tlInfo.min) : '',
+      timelineLabel: tlInfo ? String(tlVal) : '',
+      onTimeline: this.onTimeline,
+      playLabel: s.scenePlaying ? '\u25a0' : '\u25b6',
+      playTitle: s.scenePlaying ? 'Stop auto-play' : 'Play scenes automatically',
+      playBtnStyle: {
+        width: '30px', height: '30px', border: '1px solid ' + (s.scenePlaying ? 'var(--accent)' : 'var(--line)'),
+        borderRadius: '8px', background: s.scenePlaying ? 'var(--accent)' : 'none',
+        color: s.scenePlaying ? 'var(--panel)' : 'var(--ink)', fontSize: '11px', cursor: 'pointer', flexShrink: 0
+      },
+      onTogglePlay: this.onTogglePlay,
+      playProgress: s.scenePlaying ? React.createElement('div', { key: 'pp' + s.playTick, style: { height: '3px', borderRadius: '2px', background: 'var(--chip)', overflow: 'hidden' } }, React.createElement('div', { style: { height: '100%', background: 'var(--accent)', animation: 'gs-progress ' + (this.PLAY_MS / 1000) + 's linear forwards' } })) : null,
+      showOnboard: s.showOnboard,
+      onDismissOnboard: this.onDismissOnboard,
+      onboardCardStyle: {
+        width: s.isNarrow ? '100%' : '470px', maxWidth: '94vw', maxHeight: '86vh', overflow: 'auto',
+        background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '16px',
+        padding: s.isNarrow ? '20px 18px' : '26px 28px', boxShadow: '0 14px 48px rgba(20,10,4,0.4)',
+        display: 'flex', flexDirection: 'column', gap: '16px', boxSizing: 'border-box'
+      },
+      onboardGlyphStyle: {
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px',
+        borderRadius: '50%', background: 'var(--chip)', color: 'var(--accent)', fontSize: '11px', fontWeight: 700,
+        flexShrink: 0, border: '1px solid var(--line)'
+      },
+      onCopyLink: this.onCopyLink,
+      onExportImage: this.onExportImage,
+      loadOverlay: s.loadState !== 'ready',
+      loadFailed: s.loadState === 'failed',
+      loadSpinning: s.loadState === 'loading',
+      onRetryLoad: this.onRetryLoad,
       sceneTitle: activeScene ? (activeScene.name || 'Untitled scene') : 'Overview',
       scenePos: (activeScene ? scenes.indexOf(activeScene) + 2 : 1) + ' / ' + (scenes.length + 1),
       sceneText: activeScene ? (activeScene.text || '') : '',

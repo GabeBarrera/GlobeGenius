@@ -105,6 +105,21 @@ Right edge (view mode):
   the active tab is highlighted, and clicking the other tab switches the panel
   to that content. The ✕ (or the active tab) closes it.
 
+Viewing extras:
+- **Deep links** — the URL hash tracks the current globe, scene and projection;
+  menu → **Copy link to view** also captures the exact camera angle so a pasted
+  link reopens precisely that view.
+- **Scene auto-play** — the ▶ button in the scene stepper advances scenes on a
+  9-second timer with a progress bar; stop with ■, Esc, or by dragging the globe.
+- **Timeline** — when a globe's connections carry years (WWII and Cyber Attacks
+  do out of the box), a scrubber appears above the scene bar; drag it to reveal
+  connections cumulatively by year. Set a connection's year in the editor's
+  Connections tab.
+- **Export image (PNG)** — in the ☰ menu, downloads the current view.
+- **Keyboard** — ← → step scenes, Space toggles rotation, Esc closes/cancels.
+- A first-run welcome card introduces the controls (shown once per browser),
+  and a loading / "map could not load" screen covers CDN startup.
+
 Auto-rotation:
 - Dragging the globe (or stepping through scenes) pauses the spin; it
   **resumes automatically after 20 seconds** without interaction.
