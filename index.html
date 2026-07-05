@@ -382,6 +382,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
                   <span style="font-size: 11px; color: var(--muted); width: 32px; flex-shrink: 0;">Path</span>
                   <select value="{{ f.dir }}" data-id="{{ f.id }}" data-field="dir" onChange="{{ onFlowField }}" title="Force the band to leave the origin heading east or west" style="flex: 1; min-width: 0; padding: 4px 5px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 11px;">
                     <option value="auto">shortest path</option>
+                    <option value="optimal">optimal route (cross date line)</option>
                     <option value="east">head east</option>
                     <option value="west">head west</option>
                   </select>
@@ -681,12 +682,12 @@ class Component extends DCLogic {
         flows: [
           { id: 'ww1', source: 'US', target: 'GB', value: 40, color: null, reversed: false, note: 'Atlantic convoys carried the bulk of lend-lease materiel \u2014 over $31B of aid to Britain.', citation: 'US State Dept., lend-lease records', waypoints: [{ longitude: -40, latitude: 48 }] },
           { id: 'ww2', source: 'US', target: 'RU', value: 25, color: null, reversed: false, note: 'Arctic convoys to Murmansk and Archangel braved U-boats and polar ice to supply the USSR.', citation: 'Imperial War Museums', waypoints: [{ longitude: -25, latitude: 62 }, { longitude: 15, latitude: 72 }] },
-          { id: 'ww3', source: 'US', target: 'AU', value: 15, color: null, reversed: false, note: 'Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.', citation: '', waypoints: [{ longitude: -160, latitude: 5 }] },
+          { id: 'ww3', source: 'US', target: 'AU', value: 15, color: null, reversed: false, dir: 'optimal', note: 'Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.', citation: '', waypoints: [{ longitude: -160, latitude: 5 }] },
           { id: 'ww4', source: 'DE', target: 'RU', value: 35, color: '#7d3b2d', reversed: false, note: 'Operation Barbarossa, June 1941 \u2014 the largest land invasion in history, with over 3 million Axis troops.', citation: 'The National WWII Museum', waypoints: [] },
-          { id: 'ww5', source: 'JP', target: 'US', value: 20, color: '#7d3b2d', reversed: false, note: 'The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.', citation: 'The National WWII Museum', targetPos: { longitude: -157.95, latitude: 21.34 }, waypoints: [{ longitude: 175, latitude: 30 }] },
+          { id: 'ww5', source: 'JP', target: 'US', value: 20, color: '#7d3b2d', reversed: false, dir: 'optimal', note: 'The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.', citation: 'The National WWII Museum', targetPos: { longitude: -157.95, latitude: 21.34 }, waypoints: [{ longitude: 175, latitude: 30 }] },
           { id: 'ww6', source: 'GB', target: 'FR', value: 30, color: null, reversed: false, note: 'Operation Overlord \u2014 the D-Day landings in Normandy, 6 June 1944.', citation: 'Imperial War Museums', targetPos: { longitude: -0.88, latitude: 49.4 }, waypoints: [] },
           { id: 'ww7', source: 'JP', target: 'CN', value: 25, color: '#7d3b2d', reversed: false, note: 'The Second Sino-Japanese War merged into WWII, tying down the bulk of Japan\u2019s army.', citation: '', waypoints: [] },
-          { id: 'ww8', source: 'US', target: 'JP', value: 18, color: null, reversed: false, note: 'The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.', citation: '', waypoints: [{ longitude: 165, latitude: 15 }] }
+          { id: 'ww8', source: 'US', target: 'JP', value: 18, color: null, reversed: false, dir: 'optimal', note: 'The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.', citation: '', waypoints: [{ longitude: 165, latitude: 15 }] }
         ],
         markers: [
           { id: 'wm1', type: 'pin', label: 'Pearl Harbor', color: '#7d3b2d', longitude: -157.95, latitude: 21.34 },
@@ -723,12 +724,12 @@ class Component extends DCLogic {
         flows: [
           { id: 'cy1', source: 'RU', target: 'EE', value: 12, color: null, reversed: false, note: '2007 Estonia DDoS \u2014 banks, ministries and media knocked offline for weeks; NATO founded its cyber defence centre in Tallinn in response.', citation: 'NATO CCDCOE', waypoints: [] },
           { id: 'cy2', source: 'IL', target: 'IR', value: 18, color: null, reversed: false, note: 'Stuxnet (2010), attributed to a US\u2013Israel operation, physically sabotaged uranium-enrichment centrifuges at Natanz.', citation: 'Symantec W32.Stuxnet dossier', waypoints: [] },
-          { id: 'cy3', source: 'KP', target: 'US', value: 14, color: null, reversed: false, note: 'Sony Pictures hack (2014), attributed by the FBI to North Korea\u2019s Lazarus Group.', citation: 'FBI statement, Dec 2014', waypoints: [{ longitude: 178, latitude: 35 }] },
+          { id: 'cy3', source: 'KP', target: 'US', value: 14, color: null, reversed: false, dir: 'optimal', note: 'Sony Pictures hack (2014), attributed by the FBI to North Korea\u2019s Lazarus Group.', citation: 'FBI statement, Dec 2014', waypoints: [{ longitude: 178, latitude: 35 }] },
           { id: 'cy4', source: 'KP', target: 'GB', value: 15, color: null, reversed: false, note: 'WannaCry ransomware (2017) infected 200,000+ machines in 150 countries, crippling NHS hospitals.', citation: 'UK NCSC', waypoints: [{ longitude: 60, latitude: 55 }] },
           { id: 'cy5', source: 'RU', target: 'UA', value: 20, color: '#7d3b2d', reversed: false, note: 'NotPetya (2017) \u2014 a wiper disguised as ransomware, spread via Ukrainian tax software; ~$10B in global damages, the costliest cyberattack in history.', citation: 'White House attribution, Feb 2018', waypoints: [] },
           { id: 'cy6', source: 'RU', target: 'US', value: 16, color: '#7d3b2d', reversed: false, note: 'SolarWinds supply-chain compromise (2020) trojanised software updates, reaching nine US federal agencies.', citation: 'CISA / joint agency statement', waypoints: [{ longitude: -30, latitude: 55 }] },
           { id: 'cy7', source: 'IR', target: 'SA', value: 13, color: null, reversed: false, note: 'Shamoon (2012) wiped roughly 30,000 Saudi Aramco workstations.', citation: 'Reuters investigation', waypoints: [] },
-          { id: 'cy8', source: 'CN', target: 'US', value: 12, color: null, reversed: false, note: 'OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.', citation: 'US OPM', waypoints: [{ longitude: 178, latitude: 45 }] }
+          { id: 'cy8', source: 'CN', target: 'US', value: 12, color: null, reversed: false, dir: 'optimal', note: 'OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.', citation: 'US OPM', waypoints: [{ longitude: 178, latitude: 45 }] }
         ],
         markers: [
           { id: 'cm1', type: 'dot', label: 'Morris worm, 1988', color: '#8b5e3c', longitude: -71.09, latitude: 42.36 },
@@ -832,6 +833,7 @@ class Component extends DCLogic {
         if (sf) {
           if (!f.note && sf.note) f.note = sf.note;
           if (!f.citation && sf.citation) f.citation = sf.citation;
+          if ((!f.dir || f.dir === 'auto') && sf.dir && sf.dir !== 'auto') f.dir = sf.dir;
         }
       });
     });
@@ -1104,6 +1106,29 @@ class Component extends DCLogic {
             return { longitude: Math.round(lon * 100) / 100, latitude: Math.round(lat * 100) / 100 };
           };
           wps = [mk(1 / 3), mk(2 / 3)].concat(wps);
+        }
+      } else if (f.dir === 'optimal') {
+        // Cross the antimeridian when that is the shorter way: unwrap the
+        // target longitude onto a continuous scale so the band takes the
+        // short hop instead of circling the globe.
+        const spos = f.sourcePos || (this.centroids || {})[sid];
+        const tpos = f.targetPos || (this.centroids || {})[tid];
+        if (spos && tpos && Math.abs(tpos.longitude - spos.longitude) > 180) {
+          let delta = tpos.longitude - spos.longitude;
+          delta = ((delta % 360) + 540) % 360 - 180;
+          const tlon = spos.longitude + delta;
+          item.targetLongitude = Math.round(tlon * 100) / 100;
+          item.targetLatitude = tpos.latitude;
+          delete item.targetId;
+          const mid = spos.longitude + delta / 2;
+          wps = wps.map(w => {
+            let best = w.longitude, bd = Infinity;
+            [w.longitude - 360, w.longitude, w.longitude + 360].forEach(c => {
+              const d = Math.abs(c - mid);
+              if (d < bd) { bd = d; best = c; }
+            });
+            return { longitude: Math.round(best * 100) / 100, latitude: w.latitude };
+          });
         }
       }
       if (wps.length) item.waypoints = wps;

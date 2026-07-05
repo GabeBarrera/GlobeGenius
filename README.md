@@ -123,7 +123,9 @@ Opens a side panel with **Save** and **Discard**:
 
 The editor's tabs cover countries/roles, connections (with draggable
 from/to pins on the map), markers, scenes, catalogue metadata, and a rich-text
-write-up.
+write-up. Each connection's **Path** setting offers *shortest path*, *optimal
+route (cross date line)* — for Pacific-crossing routes that would otherwise
+circle the globe the long way — or forcing the band to head *east*/*west*.
 
 ### Editing without the server (static hosting)
 
