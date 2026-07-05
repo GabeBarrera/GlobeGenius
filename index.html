@@ -10,7 +10,7 @@
 <helmet>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Globe Studio</title>
+<title>Globe Genius</title>
 <style>
 html, body { margin: 0; padding: 0; height: 100%; }
 body {
@@ -206,6 +206,19 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
     </div>
   </sc-if>
 
+  <!-- Notes pullout (personal, static hosting only) -->
+  <sc-if value="{{ showNotesTab }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ onToggleNotes }}" style="{{ notesTabStyle }}">Notes</button>
+    <div style="{{ notesPanelStyle }}">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 16px 10px 16px; border-bottom: 1px solid var(--line); flex-shrink: 0;">
+        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700;">My notes</div>
+        <button onClick="{{ onToggleNotes }}" style="border: none; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 4px;">&#10005;</button>
+      </div>
+      <div ref="{{ notesViewRef }}" class="gs-writeup" style="flex: 1; overflow: auto; padding: 14px 20px 20px 20px; font-size: 13px;"></div>
+      <div style="flex-shrink: 0; border-top: 1px solid var(--line); padding: 10px 20px 14px 20px; font-size: 11px; color: var(--muted);">Personal notes on &#8220;{{ docName }}&#8221; &mdash; saved in this browser only.</div>
+    </div>
+  </sc-if>
+
   <!-- Library drawer -->
   <div style="{{ drawerStyle }}">
     <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 10px 16px; border-bottom: 1px solid var(--line);">
@@ -250,6 +263,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
         <div style="font-size: 12px; color: var(--muted); text-align: center; padding: 18px 8px;">No globes match.</div>
       </sc-if>
     </div>
+    <sc-if value="{{ serverOnline }}" hint-placeholder-val="{{ false }}">
     <div style="padding: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
       <button onClick="{{ onNewDoc }}" style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--accent); color: var(--panel); font-size: 12px; font-weight: 600; cursor: pointer;">+ New globe</button>
       <button onClick="{{ onDuplicateDoc }}" style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer;">Duplicate</button>
@@ -257,6 +271,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
       <label style="padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--ink); font-size: 12px; cursor: pointer; text-align: center;">Import JSON<input type="file" accept=".json,application/json" onChange="{{ onImport }}" style="display: none;"></label>
       <button onClick="{{ onDeleteDoc }}" style="grid-column: 1 / -1; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--danger); font-size: 12px; cursor: pointer;">Delete this globe</button>
     </div>
+    </sc-if>
   </div>
 
   <!-- Editor panel -->
@@ -271,12 +286,19 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
         </div>
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0 14px;">
-        <button data-tab="countries" onClick="{{ onSetTab }}" style="{{ tabCountriesStyle }}">Countries</button>
-        <button data-tab="flows" onClick="{{ onSetTab }}" style="{{ tabFlowsStyle }}">Connections</button>
+        <sc-if value="{{ canEditDoc }}" hint-placeholder-val="{{ false }}">
+          <button data-tab="countries" onClick="{{ onSetTab }}" style="{{ tabCountriesStyle }}">Countries</button>
+          <button data-tab="flows" onClick="{{ onSetTab }}" style="{{ tabFlowsStyle }}">Connections</button>
+        </sc-if>
         <button data-tab="markers" onClick="{{ onSetTab }}" style="{{ tabMarkersStyle }}">Markers</button>
-        <button data-tab="scenes" onClick="{{ onSetTab }}" style="{{ tabScenesStyle }}">Scenes</button>
-        <button data-tab="meta" onClick="{{ onSetTab }}" style="{{ tabMetaStyle }}">Info</button>
-        <button data-tab="writeup" onClick="{{ onSetTab }}" style="{{ tabWriteupStyle }}">Write-up</button>
+        <sc-if value="{{ canEditDoc }}" hint-placeholder-val="{{ false }}">
+          <button data-tab="scenes" onClick="{{ onSetTab }}" style="{{ tabScenesStyle }}">Scenes</button>
+          <button data-tab="meta" onClick="{{ onSetTab }}" style="{{ tabMetaStyle }}">Info</button>
+          <button data-tab="writeup" onClick="{{ onSetTab }}" style="{{ tabWriteupStyle }}">Write-up</button>
+        </sc-if>
+        <sc-if value="{{ notesMode }}" hint-placeholder-val="{{ false }}">
+          <button data-tab="notes" onClick="{{ onSetTab }}" style="{{ tabNotesStyle }}">Notes</button>
+        </sc-if>
       </div>
 
       <div style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px;">
@@ -491,7 +513,7 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); borde
               <input ref="{{ imgInputRef }}" type="file" accept="image/*" onChange="{{ onImageFile }}" style="display: none;">
             </div>
             <div contentEditable="true" ref="{{ writeupEditRef }}" onInput="{{ onWriteupInput }}" class="gs-writeup" style="min-height: 260px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); padding: 10px 12px; font-size: 13px; outline: none;"></div>
-            <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">Shown to viewers through the &#8220;About&#8221; pull-out tab on the right edge of the globe.</div>
+            <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">{{ richEditorHint }}</div>
           </div>
         </sc-if>
 
@@ -511,6 +533,7 @@ class Component extends DCLogic {
   chartDivRef = React.createRef();
   writeupEditRef = React.createRef();
   writeupViewRef = React.createRef();
+  notesViewRef = React.createRef();
   imgInputRef = React.createRef();
 
   state = {
@@ -528,6 +551,8 @@ class Component extends DCLogic {
     customColor: '#8fae7e',
     placing: null,
     writeupOpen: false,
+    notesOpen: false,
+    notes: {},
     libSearch: '',
     libSort: 'added',
     activeTag: null,
@@ -550,7 +575,7 @@ class Component extends DCLogic {
         name: 'Global Coffee Supply Chain',
         subtitle: 'Producers \u2192 processing hubs \u2192 consumer markets',
         unit: 'k tonnes',
-        author: 'Globe Studio', version: '1.0', yearFrom: 2023, yearTo: null,
+        author: 'Globe Genius', version: '1.0', yearFrom: 2023, yearTo: null,
         tags: ['trade', 'agriculture'],
         sources: [
           { id: 'cs1', label: 'International Coffee Organization \u2014 Trade Statistics', url: 'https://www.ico.org/trade_statistics.asp' },
@@ -585,7 +610,7 @@ class Component extends DCLogic {
         name: 'The Atlantic Triangle Trade',
         subtitle: 'Goods, enslaved people, and raw materials \u00b7 16th\u201319th c.',
         unit: 'voyages (relative)',
-        author: 'Globe Studio', version: '1.0', yearFrom: 1514, yearTo: 1866,
+        author: 'Globe Genius', version: '1.0', yearFrom: 1514, yearTo: 1866,
         tags: ['history', 'trade', 'migration'],
         sources: [
           { id: 'ts1', label: 'SlaveVoyages \u2014 Trans-Atlantic Slave Trade Database', url: 'https://www.slavevoyages.org' }
@@ -623,6 +648,91 @@ class Component extends DCLogic {
           { id: 'tm1', type: 'label', label: 'The Middle Passage', color: '#7d3b2d', longitude: -33, latitude: 6 },
           { id: 'tm2', type: 'pin', label: 'Elmina Castle', color: '#7d3b2d', longitude: -1.35, latitude: 5.08 },
           { id: 'tm3', type: 'dot', label: 'Liverpool', color: '#8b5e3c', longitude: -2.98, latitude: 53.41 }
+        ]
+      },
+      {
+        id: 'ww2',
+        name: 'World War II: A Global Conflict',
+        subtitle: 'Alliances, supply lines and offensives \u00b7 1939\u20131945',
+        unit: 'relative scale',
+        author: 'Globe Genius', version: '1.0', yearFrom: 1939, yearTo: 1945,
+        tags: ['history', 'war'],
+        sources: [
+          { id: 'ws1', label: 'The National WWII Museum \u2014 Research & Collections', url: 'https://www.nationalww2museum.org' },
+          { id: 'ws2', label: 'Imperial War Museums', url: 'https://www.iwm.org.uk' }
+        ],
+        scenes: [
+          { id: 'wsc1', name: 'Axis expansion', text: 'Germany invades the Soviet Union in June 1941; Japan strikes Pearl Harbor that December, pulling the United States into a war already raging across China.', camera: { rx: -20, ry: -45, zoom: 1 }, flowIds: ['ww4', 'ww5', 'ww7'] },
+          { id: 'wsc2', name: 'Lend-lease lifelines', text: 'American convoys ferry tanks, aircraft, food and fuel across the Atlantic to Britain, through Arctic waters to the USSR, and across the Pacific to Australia.', camera: { rx: 40, ry: -50, zoom: 1 }, flowIds: ['ww1', 'ww2', 'ww3'] },
+          { id: 'wsc3', name: 'The Allied counteroffensive', text: 'D-Day opens the Western Front in June 1944 while island-hopping campaigns close on Japan, ending the war in 1945.', camera: { rx: 0, ry: -40, zoom: 1 }, flowIds: ['ww6', 'ww8'] }
+        ],
+        writeup: '<h2>A war fought across oceans</h2><p>World War II was the first truly global war: its outcome turned as much on <b>shipping lanes and supply lines</b> as on battlefields. Darker bands mark Axis offensives; lighter bands trace the Allied lend-lease convoys that kept Britain and the Soviet Union fighting.</p><p>Page through the scenes below the globe to follow the war\u2019s arc \u2014 Axis expansion, the lend-lease lifelines, and the Allied counteroffensive that ended it.</p>',
+        roles: [
+          { id: 'allies', name: 'Allied powers', color: '#8fae7e' },
+          { id: 'axis', name: 'Axis powers', color: '#c98d6e' },
+          { id: 'neutral', name: 'Neutral states', color: '#ddc8a0' }
+        ],
+        assignments: {
+          US: { roleId: 'allies' }, GB: { roleId: 'allies' }, RU: { roleId: 'allies' }, CN: { roleId: 'allies' },
+          CA: { roleId: 'allies' }, AU: { roleId: 'allies' }, IN: { roleId: 'allies' }, NZ: { roleId: 'allies' }, ZA: { roleId: 'allies' },
+          DE: { roleId: 'axis' }, IT: { roleId: 'axis' }, JP: { roleId: 'axis' }, HU: { roleId: 'axis' }, RO: { roleId: 'axis' }, BG: { roleId: 'axis' },
+          ES: { roleId: 'neutral' }, SE: { roleId: 'neutral' }, CH: { roleId: 'neutral' }, TR: { roleId: 'neutral' }, PT: { roleId: 'neutral' }, IE: { roleId: 'neutral' }
+        },
+        flows: [
+          { id: 'ww1', source: 'US', target: 'GB', value: 40, color: null, reversed: false, note: 'Atlantic convoys carried the bulk of lend-lease materiel \u2014 over $31B of aid to Britain.', citation: 'US State Dept., lend-lease records', waypoints: [{ longitude: -40, latitude: 48 }] },
+          { id: 'ww2', source: 'US', target: 'RU', value: 25, color: null, reversed: false, note: 'Arctic convoys to Murmansk and Archangel braved U-boats and polar ice to supply the USSR.', citation: 'Imperial War Museums', waypoints: [{ longitude: -25, latitude: 62 }, { longitude: 15, latitude: 72 }] },
+          { id: 'ww3', source: 'US', target: 'AU', value: 15, color: null, reversed: false, note: 'Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.', citation: '', waypoints: [{ longitude: -160, latitude: 5 }] },
+          { id: 'ww4', source: 'DE', target: 'RU', value: 35, color: '#7d3b2d', reversed: false, note: 'Operation Barbarossa, June 1941 \u2014 the largest land invasion in history, with over 3 million Axis troops.', citation: 'The National WWII Museum', waypoints: [] },
+          { id: 'ww5', source: 'JP', target: 'US', value: 20, color: '#7d3b2d', reversed: false, note: 'The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.', citation: 'The National WWII Museum', targetPos: { longitude: -157.95, latitude: 21.34 }, waypoints: [{ longitude: 175, latitude: 30 }] },
+          { id: 'ww6', source: 'GB', target: 'FR', value: 30, color: null, reversed: false, note: 'Operation Overlord \u2014 the D-Day landings in Normandy, 6 June 1944.', citation: 'Imperial War Museums', targetPos: { longitude: -0.88, latitude: 49.4 }, waypoints: [] },
+          { id: 'ww7', source: 'JP', target: 'CN', value: 25, color: '#7d3b2d', reversed: false, note: 'The Second Sino-Japanese War merged into WWII, tying down the bulk of Japan\u2019s army.', citation: '', waypoints: [] },
+          { id: 'ww8', source: 'US', target: 'JP', value: 18, color: null, reversed: false, note: 'The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.', citation: '', waypoints: [{ longitude: 165, latitude: 15 }] }
+        ],
+        markers: [
+          { id: 'wm1', type: 'pin', label: 'Pearl Harbor', color: '#7d3b2d', longitude: -157.95, latitude: 21.34 },
+          { id: 'wm2', type: 'pin', label: 'Stalingrad', color: '#7d3b2d', longitude: 44.5, latitude: 48.7 },
+          { id: 'wm3', type: 'pin', label: 'Normandy', color: '#8b5e3c', longitude: -0.88, latitude: 49.4 },
+          { id: 'wm4', type: 'dot', label: 'Hiroshima', color: '#7d3b2d', longitude: 132.45, latitude: 34.39 }
+        ]
+      },
+      {
+        id: 'cyber',
+        name: 'A History of Cyber Attacks',
+        subtitle: 'Landmark intrusions and where they spread \u00b7 1988\u20132021',
+        unit: 'impact (relative)',
+        author: 'Globe Genius', version: '1.0', yearFrom: 1988, yearTo: 2021,
+        tags: ['history', 'technology', 'security'],
+        sources: [
+          { id: 'cy_s1', label: 'CSIS \u2014 Significant Cyber Incidents timeline', url: 'https://www.csis.org/programs/strategic-technologies-program/significant-cyber-incidents' },
+          { id: 'cy_s2', label: 'CISA \u2014 Cybersecurity Advisories', url: 'https://www.cisa.gov' }
+        ],
+        scenes: [
+          { id: 'csc1', name: 'Opening shots', text: 'The 2007 DDoS campaign against Estonia and the 2010 Stuxnet worm mark the arrival of state-scale cyber operations.', camera: { rx: -35, ry: -45, zoom: 1 }, flowIds: ['cy1', 'cy2'] },
+          { id: 'csc2', name: 'Going global', text: 'Sony Pictures (2014), Saudi Aramco (2012), the OPM breach (2015) and WannaCry (2017) show attacks leaping oceans and industries.', camera: { rx: 100, ry: -30, zoom: 1 }, flowIds: ['cy3', 'cy4', 'cy7', 'cy8'] },
+          { id: 'csc3', name: 'Supply chains & wipers', text: 'NotPetya (2017) and SolarWinds (2020) weaponise trusted software updates \u2014 the darker bands mark the two costliest operations to date.', camera: { rx: 40, ry: -48, zoom: 1 }, flowIds: ['cy5', 'cy6'] }
+        ],
+        writeup: '<h2>From worms to cyberwar</h2><p>What began in 1988 with the accidental havoc of the <b>Morris worm</b> evolved into deliberate statecraft: sabotage of industrial equipment, billion-dollar ransomware outbreaks, and supply-chain compromises reaching the heart of governments.</p><p>Each band links an attack\u2019s <i>attributed</i> origin to its primary target \u2014 attribution in cyberspace is contested by nature, so treat origins as best public assessments. Click a band for the incident\u2019s story; the darker bands mark NotPetya and SolarWinds, the two most consequential operations so far.</p>',
+        roles: [
+          { id: 'origin', name: 'Attributed origins', color: '#c98d6e' },
+          { id: 'target', name: 'Major targets', color: '#8fae7e' }
+        ],
+        assignments: {
+          RU: { roleId: 'origin' }, KP: { roleId: 'origin' }, CN: { roleId: 'origin' }, IR: { roleId: 'origin' }, IL: { roleId: 'origin' },
+          US: { roleId: 'target' }, UA: { roleId: 'target' }, EE: { roleId: 'target' }, GB: { roleId: 'target' }, SA: { roleId: 'target' }
+        },
+        flows: [
+          { id: 'cy1', source: 'RU', target: 'EE', value: 12, color: null, reversed: false, note: '2007 Estonia DDoS \u2014 banks, ministries and media knocked offline for weeks; NATO founded its cyber defence centre in Tallinn in response.', citation: 'NATO CCDCOE', waypoints: [] },
+          { id: 'cy2', source: 'IL', target: 'IR', value: 18, color: null, reversed: false, note: 'Stuxnet (2010), attributed to a US\u2013Israel operation, physically sabotaged uranium-enrichment centrifuges at Natanz.', citation: 'Symantec W32.Stuxnet dossier', waypoints: [] },
+          { id: 'cy3', source: 'KP', target: 'US', value: 14, color: null, reversed: false, note: 'Sony Pictures hack (2014), attributed by the FBI to North Korea\u2019s Lazarus Group.', citation: 'FBI statement, Dec 2014', waypoints: [{ longitude: 178, latitude: 35 }] },
+          { id: 'cy4', source: 'KP', target: 'GB', value: 15, color: null, reversed: false, note: 'WannaCry ransomware (2017) infected 200,000+ machines in 150 countries, crippling NHS hospitals.', citation: 'UK NCSC', waypoints: [{ longitude: 60, latitude: 55 }] },
+          { id: 'cy5', source: 'RU', target: 'UA', value: 20, color: '#7d3b2d', reversed: false, note: 'NotPetya (2017) \u2014 a wiper disguised as ransomware, spread via Ukrainian tax software; ~$10B in global damages, the costliest cyberattack in history.', citation: 'White House attribution, Feb 2018', waypoints: [] },
+          { id: 'cy6', source: 'RU', target: 'US', value: 16, color: '#7d3b2d', reversed: false, note: 'SolarWinds supply-chain compromise (2020) trojanised software updates, reaching nine US federal agencies.', citation: 'CISA / joint agency statement', waypoints: [{ longitude: -30, latitude: 55 }] },
+          { id: 'cy7', source: 'IR', target: 'SA', value: 13, color: null, reversed: false, note: 'Shamoon (2012) wiped roughly 30,000 Saudi Aramco workstations.', citation: 'Reuters investigation', waypoints: [] },
+          { id: 'cy8', source: 'CN', target: 'US', value: 12, color: null, reversed: false, note: 'OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.', citation: 'US OPM', waypoints: [{ longitude: 178, latitude: 45 }] }
+        ],
+        markers: [
+          { id: 'cm1', type: 'dot', label: 'Morris worm, 1988', color: '#8b5e3c', longitude: -71.09, latitude: 42.36 },
+          { id: 'cm2', type: 'pin', label: 'Natanz', color: '#7d3b2d', longitude: 51.72, latitude: 33.72 }
         ]
       }
     ];
@@ -662,7 +772,10 @@ class Component extends DCLogic {
 
   async init() {
     const online = await this.checkServer();
-    this.setState({ serverOnline: online });
+    let notes = {};
+    try { notes = JSON.parse(localStorage.getItem('globe-studio-notes-v1')) || {}; } catch (e) {}
+    if (typeof notes !== 'object' || Array.isArray(notes) || !notes) notes = {};
+    this.setState({ serverOnline: online, notes: notes, tab: online ? this.state.tab : 'markers' });
 
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem('globe-studio-v1')); } catch (e) {}
@@ -707,6 +820,7 @@ class Component extends DCLogic {
       const seed = seeds.find(x => x.id === d.id);
       if (!seed) return;
       if (!d.tags.length) d.tags = seed.tags;
+      if (!d.writeup || !String(d.writeup).replace(/<[^>]+>/g, '').trim()) d.writeup = seed.writeup || '';
       if (!d.sources.length) d.sources = seed.sources;
       if (!d.scenes.length) d.scenes = seed.scenes;
       if (!d.author) d.author = seed.author;
@@ -721,6 +835,8 @@ class Component extends DCLogic {
         }
       });
     });
+    // Add any built-in globes that this saved database predates.
+    seeds.forEach(sd => { if (!docs.some(d => d.id === sd.id)) docs.push(sd); });
     const currentId = (data.currentId && docs.some(d => d.id === data.currentId)) ? data.currentId : docs[0].id;
     const dark = !!data.dark;
     document.body.dataset.theme = dark ? 'dark' : 'light';
@@ -746,7 +862,12 @@ class Component extends DCLogic {
     const doc = this.doc();
     const ed = this.writeupEditRef.current;
     if (ed && doc) {
-      if (this._writeupFor !== doc.id) { ed.innerHTML = doc.writeup || ''; this._writeupFor = doc.id; }
+      const isNotes = this.state.tab === 'notes';
+      const edKey = doc.id + (isNotes ? ':notes' : ':writeup');
+      if (this._writeupFor !== edKey) {
+        ed.innerHTML = isNotes ? ((this.state.notes || {})[doc.id] || '') : (doc.writeup || '');
+        this._writeupFor = edKey;
+      }
     } else if (!ed) {
       this._writeupFor = null;
     }
@@ -756,6 +877,11 @@ class Component extends DCLogic {
         ? doc.writeup
         : '<p style="color: var(--muted); font-style: italic;">No write-up yet. Use \u201cEdit globe\u201d and open the Write-up tab to add one.</p>';
       if (vw._gsHtml !== html) { vw.innerHTML = html; vw._gsHtml = html; }
+    }
+    const nv = this.notesViewRef.current;
+    if (nv && doc) {
+      const nhtml = (this.state.notes || {})[doc.id] || '';
+      if (nv._gsHtml !== nhtml) { nv.innerHTML = nhtml; nv._gsHtml = nhtml; }
     }
   }
 
@@ -1132,9 +1258,8 @@ class Component extends DCLogic {
     // Title
     const narrow = this.state.isNarrow;
     const scenesBarShown = !this.state.editMode && (doc.scenes || []).length > 0;
-    const legendBarShown = narrow && !this.state.editMode && (doc.roles || []).length > 0;
     const titleCont = chart.children.push(am5.Container.new(root, {
-      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: scenesBarShown ? (narrow ? 205 : 110) : (legendBarShown ? 75 : 16)
+      layout: root.verticalLayout, x: am5.p50, centerX: am5.p50, y: am5.p100, centerY: am5.p100, paddingBottom: scenesBarShown ? (narrow ? 205 : 110) : 16
     }));
     titleCont.children.push(am5.Label.new(root, {
       text: doc.name || '', fontSize: narrow ? 15 : 20, fontWeight: '600', fontFamily: 'Georgia, serif', fill: am5.color(C.text), x: am5.p50, centerX: am5.p50, textAlign: 'center', maxWidth: narrow ? Math.max(220, window.innerWidth - 40) : 10000, oversizedBehavior: 'wrap'
@@ -1187,6 +1312,7 @@ class Component extends DCLogic {
     chart.chartContainer.events.on('pointerdown', () => {
       if (this._spin) { this._spin.stop(); this._spin = null; }
       if (this.state.autoRotate) this.setState({ autoRotate: false });
+      this.scheduleSpinResume();
     });
 
     if (!this._appeared) { chart.appear(1000, 100); this._appeared = true; }
@@ -1205,11 +1331,24 @@ class Component extends DCLogic {
   }
   onToggleSpin = () => {
     const autoRotate = !this.state.autoRotate;
+    this._spinUserPaused = !autoRotate;
+    clearTimeout(this._idleT);
     this.setState({ autoRotate }, () => {
       if (autoRotate && this.state.isGlobe && !this.state.editMode) this.startSpin();
       else this.stopSpin();
     });
   };
+  // Resume auto-rotation after 20s without globe interaction (unless the user
+  // explicitly paused it with the Rotation button).
+  scheduleSpinResume() {
+    clearTimeout(this._idleT);
+    if (this._spinUserPaused) return;
+    this._idleT = setTimeout(() => {
+      if (this._spinUserPaused || this.state.editMode || !this.state.isGlobe || this.state.placing) return;
+      if (!this.state.autoRotate) this.setState({ autoRotate: true });
+      this.startSpin();
+    }, 20000);
+  }
 
   // ---------- UI handlers ----------
   onToggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
@@ -1521,6 +1660,7 @@ class Component extends DCLogic {
     const sc = id ? ((doc || {}).scenes || []).find(x => x.id === id) : null;
     if (sc && sc.camera) this._camOverride = sc.camera;
     this.setState({ activeSceneId: sc ? sc.id : null, flowInfo: null, autoRotate: false }, () => { this.stopSpin(); this.buildChart(); });
+    this.scheduleSpinResume();
   }
   onPrevScene = () => this.stepScene(-1);
   onNextScene = () => this.stepScene(1);
@@ -1646,14 +1786,25 @@ class Component extends DCLogic {
   }
 
   // Write-up (rich text)
-  onToggleWriteup = () => this.setState({ writeupOpen: !this.state.writeupOpen });
+  onToggleWriteup = () => this.setState({ writeupOpen: !this.state.writeupOpen, notesOpen: false });
+  onToggleNotes = () => this.setState({ notesOpen: !this.state.notesOpen, writeupOpen: false });
+  saveNote(html) {
+    const doc = this.doc();
+    if (!doc) return;
+    const notes = Object.assign({}, this.state.notes);
+    const hasContent = String(html).replace(/<[^>]+>/g, '').trim() || /<img/i.test(String(html));
+    if (hasContent) notes[doc.id] = html; else delete notes[doc.id];
+    this.setState({ notes });
+    try { localStorage.setItem('globe-studio-notes-v1', JSON.stringify(notes)); } catch (e) {}
+  }
   saveWriteup(now) {
     clearTimeout(this._wt);
     const doSave = () => {
       const ed = this.writeupEditRef.current;
       if (!ed) return;
       const html = ed.innerHTML;
-      this.mutateDoc(d => { d.writeup = html; }, false);
+      if (this.state.tab === 'notes') this.saveNote(html);
+      else this.mutateDoc(d => { d.writeup = html; }, false);
     };
     if (now) doSave();
     else this._wt = setTimeout(doSave, 500);
@@ -1932,25 +2083,24 @@ class Component extends DCLogic {
         background: s.menuOpen ? 'var(--chip)' : 'var(--panel)', color: 'var(--ink)',
         fontSize: '15px', lineHeight: '1', cursor: 'pointer', boxShadow: '0 1px 4px rgba(60,30,14,0.12)'
       },
-      serverBadgeShow: s.serverOnline !== null,
-      serverBadgeLabel: s.serverOnline ? 'Server Online' : 'Server Offline',
-      serverBadgeTitle: s.serverOnline
-        ? 'Connected to the local Node server \u2014 edits are saved to data/globe_data.json.'
-        : 'No server \u2014 edits are kept in this browser only.',
+      serverBadgeShow: s.serverOnline === true,
+      serverBadgeLabel: 'Server Online',
+      serverBadgeTitle: 'Connected to the local Node server \u2014 edits are saved to data/globe_data.json.',
+      serverOnline: s.serverOnline === true,
       serverBadgeStyle: {
         display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px',
         border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)',
-        fontSize: '13px', fontWeight: 600, color: s.serverOnline ? '#1a7f37' : '#8a8a8a',
+        fontSize: '13px', fontWeight: 600, color: '#1a7f37',
         boxShadow: '0 1px 4px rgba(60,30,14,0.12)', whiteSpace: 'nowrap'
       },
       serverDotStyle: {
         width: '8px', height: '8px', borderRadius: '50%',
-        background: s.serverOnline ? '#1a7f37' : '#9a9a9a', flexShrink: 0
+        background: '#1a7f37', flexShrink: 0
       },
       toast: s.toast,
       onSaveEdit: this.onSaveEdit, onDiscardEdit: this.onDiscardEdit,
       legendStyle: s.isNarrow ? {
-        position: 'absolute', left: '10px', right: '10px', bottom: (!s.editMode && scenes.length > 0) ? '112px' : '12px', zIndex: 5,
+        position: 'absolute', left: '10px', right: '10px', top: '60px', zIndex: 5,
         background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '10px', padding: '7px 10px',
         display: 'flex', flexWrap: 'wrap', gap: '4px 14px', alignItems: 'center', boxShadow: '0 1px 6px rgba(60,30,14,0.12)'
       } : {
@@ -1981,16 +2131,43 @@ class Component extends DCLogic {
       tabIsMarkers: s.tab === 'markers',
       tabIsScenes: s.tab === 'scenes',
       tabIsMeta: s.tab === 'meta',
-      tabIsWriteup: s.tab === 'writeup',
+      tabIsWriteup: s.tab === 'writeup' || s.tab === 'notes',
+      richEditorHint: s.tab === 'notes'
+        ? 'Your personal notes on this globe \u2014 saved only in this browser, and shown through the \u201cNotes\u201d pull-out tab next to \u201cAbout\u201d.'
+        : 'Shown to viewers through the \u201cAbout\u201d pull-out tab on the right edge of the globe.',
       tabCountriesStyle: tabStyle(s.tab === 'countries'),
       tabFlowsStyle: tabStyle(s.tab === 'flows'),
       tabMarkersStyle: tabStyle(s.tab === 'markers'),
       tabScenesStyle: tabStyle(s.tab === 'scenes'),
       tabMetaStyle: tabStyle(s.tab === 'meta'),
       tabWriteupStyle: tabStyle(s.tab === 'writeup'),
+      tabNotesStyle: tabStyle(s.tab === 'notes'),
+      canEditDoc: s.serverOnline === true,
+      notesMode: s.serverOnline === false,
       showWriteupTab: !s.editMode,
+      showNotesTab: !s.editMode && s.serverOnline === false && !!String((s.notes || {})[doc.id] || '').replace(/<[^>]+>/g, '').trim(),
+      onToggleNotes: this.onToggleNotes,
+      notesViewRef: this.notesViewRef,
+      notesTabStyle: {
+        display: (s.isNarrow && (s.writeupOpen || s.notesOpen)) ? 'none' : 'block',
+        position: 'absolute', top: 'calc(50% + 46px)', right: (s.writeupOpen || s.notesOpen) ? (s.isNarrow ? '100vw' : '380px') : '0px',
+        zIndex: 13, writingMode: 'vertical-rl',
+        padding: '14px 7px', border: '1px solid var(--line)', borderRight: 'none',
+        borderRadius: '10px 0 0 10px', background: s.notesOpen ? 'var(--chip)' : 'var(--panel)',
+        color: 'var(--ink)', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em',
+        cursor: 'pointer', boxShadow: '-2px 0 8px rgba(30,15,5,0.12)', transition: 'right 0.25s ease'
+      },
+      notesPanelStyle: {
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: s.isNarrow ? '100%' : '380px', maxWidth: '100%',
+        background: 'var(--panel)', borderLeft: '1px solid var(--line)', zIndex: 12,
+        display: 'flex', flexDirection: 'column',
+        boxShadow: '-4px 0 18px rgba(30,15,5,0.15)',
+        transform: s.notesOpen ? 'translateX(0)' : 'translateX(105%)',
+        transition: 'transform 0.25s ease'
+      },
       writeupTabStyle: {
-        position: 'absolute', top: '50%', right: s.writeupOpen ? '380px' : '0px',
+        display: (s.isNarrow && (s.writeupOpen || s.notesOpen)) ? 'none' : 'block',
+        position: 'absolute', top: '50%', right: (s.writeupOpen || s.notesOpen) ? (s.isNarrow ? '100vw' : '380px') : '0px',
         transform: 'translateY(-50%)', zIndex: 13, writingMode: 'vertical-rl',
         padding: '14px 7px', border: '1px solid var(--line)', borderRight: 'none',
         borderRadius: '10px 0 0 10px', background: s.writeupOpen ? 'var(--chip)' : 'var(--panel)',
@@ -1998,7 +2175,7 @@ class Component extends DCLogic {
         cursor: 'pointer', boxShadow: '-2px 0 8px rgba(30,15,5,0.12)', transition: 'right 0.25s ease'
       },
       writeupPanelStyle: {
-        position: 'absolute', top: 0, right: 0, bottom: 0, width: '380px', maxWidth: '85vw',
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: s.isNarrow ? '100%' : '380px', maxWidth: '100%',
         background: 'var(--panel)', borderLeft: '1px solid var(--line)', zIndex: 12,
         display: 'flex', flexDirection: 'column',
         boxShadow: '-4px 0 18px rgba(30,15,5,0.15)',

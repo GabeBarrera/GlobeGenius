@@ -1,4 +1,4 @@
-// Globe Studio local server
+// Globe Genius local server
 // Usage: node server.js   (then open http://localhost:8000)
 // Serves the static site AND persists editor changes to data/globe_data.json.
 // When the site is opened through this server, the app shows a green
@@ -119,6 +119,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log('Globe Studio server running at http://localhost:' + PORT);
+  console.log('Globe Genius server running at http://localhost:' + PORT);
   console.log('Editing the site will now save to ' + path.relative(ROOT, DATA_FILE));
 });

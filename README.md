@@ -1,4 +1,4 @@
-# Globe Studio
+# Globe Genius
 
 An interactive 3D globe (and flat-map) framework for authoring and presenting
 geographic flow data — trade routes, migrations, supply chains, historical
@@ -6,16 +6,19 @@ networks. Countries are colored by role, connections are drawn as curved bands
 whose thickness scales with value, and each globe can carry markers, guided
 "scenes", a write-up, and cited sources.
 
-Two example globes ship with it: **Global Coffee Supply Chain** and **The
-Atlantic Triangle Trade**.
+Four example globes ship with it: **Global Coffee Supply Chain**, **The
+Atlantic Triangle Trade**, **World War II: A Global Conflict**, and **A History
+of Cyber Attacks**. All four come with pre-filled write-ups; new built-in
+globes are merged into older saved databases automatically.
 
 ---
 
 ## Quick start
 
-### Option A — with the local server (recommended)
+### Option A — with the local server (full editing)
 
-Lets you edit globes in the browser and have changes saved back to disk.
+Lets you manage the library and edit globes in the browser, with changes saved
+back to disk.
 
 ```bash
 node server.js
@@ -33,9 +36,16 @@ PORT=9000 node server.js
 
 ### Option B — static hosting (GitHub Pages, Netlify, any static host)
 
-Just serve the folder. There's no server to save changes, so the app shows a
-gray **Server Offline** badge and keeps any edits in the browser's local
-storage (per-browser, not written to the shared JSON file).
+Just serve the folder. This is **viewer mode with personal notes**: there is no
+badge and no library management —
+
+- The Globes drawer lets you browse, search, and switch globes, but the
+  **+ New globe / Duplicate / Export JSON / Import JSON / Delete** actions are
+  hidden (they require the server).
+- The editor is reduced to **Markers** and a personal **Notes** tab (see
+  below). The Countries, Connections, Scenes, Info, and Write-up tabs are
+  server-only.
+- Any changes you can make are kept in the browser's local storage only.
 
 > Open it through a web server, not by double-clicking the file. A `file://`
 > URL can't `fetch()` the data file. `node server.js`, `python3 -m http.server`,
@@ -66,28 +76,47 @@ internet connection is needed to draw the map.
 - **No server:** the app loads initial content from the file, then any edits you
   make are stored only in your browser's local storage. Your local edits take
   precedence over the shipped file on reload, so nothing is lost.
+- **Personal notes** (static hosting) are stored separately in local storage
+  (`globe-studio-notes-v1`), keyed per globe — they never touch the JSON file.
 
-You can also **Export JSON** / **Import JSON** from the Globes drawer to move a
-single globe between machines.
+With the server running you can also **Export JSON** / **Import JSON** from the
+Globes drawer to move a single globe between machines.
 
 ---
 
 ## Using the app
 
 Top-left:
-- **Globes** — open the library drawer to search, switch, add, duplicate,
-  import, export, or delete globes.
-- **Server Online / Offline** badge — whether changes are being saved to disk.
+- **Globes** — open the library drawer to search and switch globes. With the
+  server running it also offers **+ New globe, Duplicate, Export JSON,
+  Import JSON,** and **Delete this globe**.
+- A green **Server Online** badge appears when the Node server is detected;
+  when hosted statically no badge is shown.
 
 Top-right:
 - **Rotation** — start/stop auto-spin (globe mode).
 - **☰ menu** — Edit globe, Data table, Flat map ⇄ Globe, and Dark mode.
 
-Editing a globe (menu → **Edit globe**) opens a side panel with **Save** and
-**Discard**:
+Right edge (view mode):
+- **About** pull-out tab — the globe's write-up, sources, and archive stamp.
+- **Notes** pull-out tab (static hosting only) — appears just below About once
+  you've written a note for the current globe.
+- Selecting either tab slides the panel out and both tabs travel with its edge;
+  the active tab is highlighted, and clicking the other tab switches the panel
+  to that content. The ✕ (or the active tab) closes it.
+
+Auto-rotation:
+- Dragging the globe (or stepping through scenes) pauses the spin; it
+  **resumes automatically after 20 seconds** without interaction.
+- Pausing with the **Rotation** button is explicit — it stays paused until you
+  press it again.
+
+### Editing with the server (menu → **Edit globe**)
+
+Opens a side panel with **Save** and **Discard**:
 - Changes stay in memory while you edit.
-- **Save** writes them to `data/globe_data.json` (or local storage if offline)
-  and shows a **Changes saved** confirmation.
+- **Save** writes them to `data/globe_data.json` and shows a **Changes saved**
+  confirmation.
 - **Discard** reverts to the state before you started editing (and removes a
   brand-new globe entirely).
 - Deleting a globe shows a **Globe deleted** confirmation once written.
@@ -96,15 +125,25 @@ The editor's tabs cover countries/roles, connections (with draggable
 from/to pins on the map), markers, scenes, catalogue metadata, and a rich-text
 write-up.
 
+### Editing without the server (static hosting)
+
+**Edit globe** opens the same panel with two tabs:
+- **Markers** — add/move/delete pins, dots, and labels (saved to this browser).
+- **Notes** — a personal rich-text scratchpad for the current globe, with the
+  same formatting toolbar as the write-up editor (headings, lists, alignment,
+  fonts, pictures). Notes are private to this browser, saved per globe, and
+  surface through the **Notes** pull-out tab in view mode.
+
 ---
 
 ## Mobile / small screens
 
-Below 640px wide the UI adapts automatically: the role legend collapses to a
-compact strip above the scene stepper, the globe title shrinks and wraps clear
-of the bottom controls, the subtitle and on-screen zoom buttons are hidden
-(pinch to zoom), and the editor panel fits the screen width. It re-lays-out live
-as the window resizes.
+Below 640px wide the UI adapts automatically: the role legend moves to a strip
+directly under the top toolbar (above the globe), the globe title shrinks and
+wraps clear of the bottom controls, the subtitle and on-screen zoom buttons are
+hidden (pinch to zoom), the About/Notes panels open full-width (their edge tabs
+hide while open; close with ✕), and the editor panel fits the screen width. It
+re-lays-out live as the window resizes.
 
 ---
 
@@ -128,7 +167,7 @@ the request size at 25 MB.
 ```
 index.html            The app
 support.js            Runtime
-server.js            Local server + save API (Node, no dependencies)
+server.js             Local server + save API (Node, no dependencies)
 data/
   globe_data.json     All globe data
 ```
