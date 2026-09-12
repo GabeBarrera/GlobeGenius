@@ -1,6 +1,4 @@
 {
-  "currentId": "coffee",
-  "dark": false,
   "docs": [
     {
       "id": "coffee",
@@ -116,7 +114,14 @@
           "value": 350,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf1",
@@ -125,7 +130,14 @@
           "value": 450,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf2",
@@ -134,7 +146,14 @@
           "value": 200,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf3",
@@ -143,7 +162,14 @@
           "value": 200,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf4",
@@ -152,7 +178,14 @@
           "value": 150,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf5",
@@ -161,7 +194,14 @@
           "value": 250,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf6",
@@ -170,7 +210,14 @@
           "value": 80,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf7",
@@ -179,7 +226,14 @@
           "value": 60,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf8",
@@ -188,7 +242,14 @@
           "value": 40,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf9",
@@ -197,7 +258,14 @@
           "value": 80,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf10",
@@ -206,7 +274,14 @@
           "value": 60,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf11",
@@ -215,7 +290,14 @@
           "value": 40,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf12",
@@ -224,7 +306,14 @@
           "value": 150,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf13",
@@ -233,7 +322,14 @@
           "value": 100,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf14",
@@ -242,7 +338,14 @@
           "value": 80,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf15",
@@ -251,7 +354,14 @@
           "value": 120,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf16",
@@ -260,7 +370,14 @@
           "value": 100,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf17",
@@ -269,7 +386,14 @@
           "value": 80,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf18",
@@ -278,7 +402,14 @@
           "value": 50,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf19",
@@ -287,7 +418,14 @@
           "value": 40,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf20",
@@ -296,7 +434,14 @@
           "value": 120,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "cf21",
@@ -305,10 +450,18 @@
           "value": 80,
           "color": null,
           "reversed": false,
-          "waypoints": []
+          "waypoints": [],
+          "note": "",
+          "citation": "",
+          "unit": "k tonnes",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         }
       ],
-      "markers": []
+      "markers": [],
+      "updatedAt": null
     },
     {
       "id": "triangle",
@@ -455,7 +608,14 @@
               "longitude": -14,
               "latitude": 30
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt2",
@@ -469,7 +629,14 @@
               "longitude": -12,
               "latitude": 33
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt3",
@@ -487,7 +654,14 @@
               "longitude": -2,
               "latitude": -6
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt4",
@@ -503,7 +677,12 @@
               "longitude": -30,
               "latitude": 10
             }
-          ]
+          ],
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt5",
@@ -517,7 +696,14 @@
               "longitude": -40,
               "latitude": 15
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt6",
@@ -531,7 +717,14 @@
               "longitude": -18,
               "latitude": -14
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt7",
@@ -545,7 +738,14 @@
               "longitude": -35,
               "latitude": 12
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt8",
@@ -559,7 +759,14 @@
               "longitude": -45,
               "latitude": 35
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt9",
@@ -573,7 +780,14 @@
               "longitude": -38,
               "latitude": 33
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt10",
@@ -587,7 +801,14 @@
               "longitude": -28,
               "latitude": 18
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         },
         {
           "id": "tt11",
@@ -601,7 +822,14 @@
               "longitude": -42,
               "latitude": 45
             }
-          ]
+          ],
+          "note": "",
+          "citation": "",
+          "unit": "voyages (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "year": null,
+          "dir": "auto"
         }
       ],
       "markers": [
@@ -629,7 +857,652 @@
           "longitude": -2.98,
           "latitude": 53.41
         }
-      ]
+      ],
+      "updatedAt": null
+    },
+    {
+      "id": "ww2",
+      "name": "World War II: A Global Conflict",
+      "subtitle": "Alliances, supply lines and offensives · 1939–1945",
+      "unit": "relative scale",
+      "author": "Globe Genius",
+      "version": "1.0",
+      "yearFrom": 1939,
+      "yearTo": 1945,
+      "tags": [
+        "history",
+        "war"
+      ],
+      "sources": [
+        {
+          "id": "ws1",
+          "label": "The National WWII Museum — Research & Collections",
+          "url": "https://www.nationalww2museum.org"
+        },
+        {
+          "id": "ws2",
+          "label": "Imperial War Museums",
+          "url": "https://www.iwm.org.uk"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "wsc1",
+          "name": "Axis expansion",
+          "text": "Germany invades the Soviet Union in June 1941; Japan strikes Pearl Harbor that December, pulling the United States into a war already raging across China.",
+          "camera": {
+            "rx": -20,
+            "ry": -45,
+            "zoom": 1
+          },
+          "flowIds": [
+            "ww4",
+            "ww5",
+            "ww7"
+          ]
+        },
+        {
+          "id": "wsc2",
+          "name": "Lend-lease lifelines",
+          "text": "American convoys ferry tanks, aircraft, food and fuel across the Atlantic to Britain, through Arctic waters to the USSR, and across the Pacific to Australia.",
+          "camera": {
+            "rx": 40,
+            "ry": -50,
+            "zoom": 1
+          },
+          "flowIds": [
+            "ww1",
+            "ww2",
+            "ww3"
+          ]
+        },
+        {
+          "id": "wsc3",
+          "name": "The Allied counteroffensive",
+          "text": "D-Day opens the Western Front in June 1944 while island-hopping campaigns close on Japan, ending the war in 1945.",
+          "camera": {
+            "rx": 0,
+            "ry": -40,
+            "zoom": 1
+          },
+          "flowIds": [
+            "ww6",
+            "ww8"
+          ]
+        }
+      ],
+      "writeup": "<h2>A war fought across oceans</h2><p>World War II was the first truly global war: its outcome turned as much on <b>shipping lanes and supply lines</b> as on battlefields. Darker bands mark Axis offensives; lighter bands trace the Allied lend-lease convoys that kept Britain and the Soviet Union fighting.</p><p>Page through the scenes below the globe to follow the war’s arc — Axis expansion, the lend-lease lifelines, and the Allied counteroffensive that ended it.</p>",
+      "roles": [
+        {
+          "id": "allies",
+          "name": "Allied powers",
+          "color": "#8fae7e"
+        },
+        {
+          "id": "axis",
+          "name": "Axis powers",
+          "color": "#c98d6e"
+        },
+        {
+          "id": "neutral",
+          "name": "Neutral states",
+          "color": "#ddc8a0"
+        }
+      ],
+      "assignments": {
+        "US": {
+          "roleId": "allies"
+        },
+        "GB": {
+          "roleId": "allies"
+        },
+        "RU": {
+          "roleId": "allies"
+        },
+        "CN": {
+          "roleId": "allies"
+        },
+        "CA": {
+          "roleId": "allies"
+        },
+        "AU": {
+          "roleId": "allies"
+        },
+        "IN": {
+          "roleId": "allies"
+        },
+        "NZ": {
+          "roleId": "allies"
+        },
+        "ZA": {
+          "roleId": "allies"
+        },
+        "DE": {
+          "roleId": "axis"
+        },
+        "IT": {
+          "roleId": "axis"
+        },
+        "JP": {
+          "roleId": "axis"
+        },
+        "HU": {
+          "roleId": "axis"
+        },
+        "RO": {
+          "roleId": "axis"
+        },
+        "BG": {
+          "roleId": "axis"
+        },
+        "ES": {
+          "roleId": "neutral"
+        },
+        "SE": {
+          "roleId": "neutral"
+        },
+        "CH": {
+          "roleId": "neutral"
+        },
+        "TR": {
+          "roleId": "neutral"
+        },
+        "PT": {
+          "roleId": "neutral"
+        },
+        "IE": {
+          "roleId": "neutral"
+        }
+      },
+      "flows": [
+        {
+          "id": "ww1",
+          "source": "US",
+          "target": "GB",
+          "value": 40,
+          "year": 1941,
+          "color": null,
+          "reversed": false,
+          "note": "Atlantic convoys carried the bulk of lend-lease materiel — over $31B of aid to Britain.",
+          "citation": "US State Dept., lend-lease records",
+          "waypoints": [
+            {
+              "longitude": -40,
+              "latitude": 48
+            }
+          ],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "ww2",
+          "source": "US",
+          "target": "RU",
+          "value": 25,
+          "year": 1941,
+          "color": null,
+          "reversed": false,
+          "note": "Arctic convoys to Murmansk and Archangel braved U-boats and polar ice to supply the USSR.",
+          "citation": "Imperial War Museums",
+          "waypoints": [
+            {
+              "longitude": -25,
+              "latitude": 62
+            },
+            {
+              "longitude": 15,
+              "latitude": 72
+            }
+          ],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "ww3",
+          "source": "US",
+          "target": "AU",
+          "value": 15,
+          "year": 1942,
+          "color": null,
+          "reversed": false,
+          "dir": "optimal",
+          "note": "Pacific supply routes sustained Allied forces in the Southwest Pacific theatre.",
+          "citation": "",
+          "waypoints": [
+            {
+              "longitude": -160,
+              "latitude": 5
+            }
+          ],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null
+        },
+        {
+          "id": "ww4",
+          "source": "DE",
+          "target": "RU",
+          "value": 35,
+          "year": 1941,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "note": "Operation Barbarossa, June 1941 — the largest land invasion in history, with over 3 million Axis troops.",
+          "citation": "The National WWII Museum",
+          "waypoints": [],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "ww5",
+          "source": "JP",
+          "target": "US",
+          "value": 20,
+          "year": 1941,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "dir": "optimal",
+          "note": "The attack on Pearl Harbor, 7 December 1941, brought the United States into the war.",
+          "citation": "The National WWII Museum",
+          "targetPos": {
+            "longitude": -157.95,
+            "latitude": 21.34
+          },
+          "waypoints": [
+            {
+              "longitude": 175,
+              "latitude": 30
+            }
+          ],
+          "unit": "relative scale",
+          "sourcePos": null
+        },
+        {
+          "id": "ww6",
+          "source": "GB",
+          "target": "FR",
+          "value": 30,
+          "year": 1944,
+          "color": null,
+          "reversed": false,
+          "note": "Operation Overlord — the D-Day landings in Normandy, 6 June 1944.",
+          "citation": "Imperial War Museums",
+          "targetPos": {
+            "longitude": -0.88,
+            "latitude": 49.4
+          },
+          "waypoints": [],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "ww7",
+          "source": "JP",
+          "target": "CN",
+          "value": 25,
+          "year": 1939,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "note": "The Second Sino-Japanese War merged into WWII, tying down the bulk of Japan’s army.",
+          "citation": "",
+          "waypoints": [],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "ww8",
+          "source": "US",
+          "target": "JP",
+          "value": 18,
+          "year": 1943,
+          "color": null,
+          "reversed": false,
+          "dir": "optimal",
+          "note": "The island-hopping campaign carried Allied forces across the Pacific toward the Japanese home islands.",
+          "citation": "",
+          "waypoints": [
+            {
+              "longitude": 165,
+              "latitude": 15
+            }
+          ],
+          "unit": "relative scale",
+          "sourcePos": null,
+          "targetPos": null
+        }
+      ],
+      "markers": [
+        {
+          "id": "wm1",
+          "type": "pin",
+          "label": "Pearl Harbor",
+          "color": "#7d3b2d",
+          "longitude": -157.95,
+          "latitude": 21.34
+        },
+        {
+          "id": "wm2",
+          "type": "pin",
+          "label": "Stalingrad",
+          "color": "#7d3b2d",
+          "longitude": 44.5,
+          "latitude": 48.7
+        },
+        {
+          "id": "wm3",
+          "type": "pin",
+          "label": "Normandy",
+          "color": "#8b5e3c",
+          "longitude": -0.88,
+          "latitude": 49.4
+        },
+        {
+          "id": "wm4",
+          "type": "dot",
+          "label": "Hiroshima",
+          "color": "#7d3b2d",
+          "longitude": 132.45,
+          "latitude": 34.39
+        }
+      ],
+      "updatedAt": null
+    },
+    {
+      "id": "cyber",
+      "name": "A History of Cyber Attacks",
+      "subtitle": "Landmark intrusions and where they spread · 1988–2021",
+      "unit": "impact (relative)",
+      "author": "Globe Genius",
+      "version": "1.0",
+      "yearFrom": 1988,
+      "yearTo": 2021,
+      "tags": [
+        "history",
+        "technology",
+        "security"
+      ],
+      "sources": [
+        {
+          "id": "cy_s1",
+          "label": "CSIS — Significant Cyber Incidents timeline",
+          "url": "https://www.csis.org/programs/strategic-technologies-program/significant-cyber-incidents"
+        },
+        {
+          "id": "cy_s2",
+          "label": "CISA — Cybersecurity Advisories",
+          "url": "https://www.cisa.gov"
+        }
+      ],
+      "scenes": [
+        {
+          "id": "csc1",
+          "name": "Opening shots",
+          "text": "The 2007 DDoS campaign against Estonia and the 2010 Stuxnet worm mark the arrival of state-scale cyber operations.",
+          "camera": {
+            "rx": -35,
+            "ry": -45,
+            "zoom": 1
+          },
+          "flowIds": [
+            "cy1",
+            "cy2"
+          ]
+        },
+        {
+          "id": "csc2",
+          "name": "Going global",
+          "text": "Sony Pictures (2014), Saudi Aramco (2012), the OPM breach (2015) and WannaCry (2017) show attacks leaping oceans and industries.",
+          "camera": {
+            "rx": 100,
+            "ry": -30,
+            "zoom": 1
+          },
+          "flowIds": [
+            "cy3",
+            "cy4",
+            "cy7",
+            "cy8"
+          ]
+        },
+        {
+          "id": "csc3",
+          "name": "Supply chains & wipers",
+          "text": "NotPetya (2017) and SolarWinds (2020) weaponise trusted software updates — the darker bands mark the two costliest operations to date.",
+          "camera": {
+            "rx": 40,
+            "ry": -48,
+            "zoom": 1
+          },
+          "flowIds": [
+            "cy5",
+            "cy6"
+          ]
+        }
+      ],
+      "writeup": "<h2>From worms to cyberwar</h2><p>What began in 1988 with the accidental havoc of the <b>Morris worm</b> evolved into deliberate statecraft: sabotage of industrial equipment, billion-dollar ransomware outbreaks, and supply-chain compromises reaching the heart of governments.</p><p>Each band links an attack’s <i>attributed</i> origin to its primary target — attribution in cyberspace is contested by nature, so treat origins as best public assessments. Click a band for the incident’s story; the darker bands mark NotPetya and SolarWinds, the two most consequential operations so far.</p>",
+      "roles": [
+        {
+          "id": "origin",
+          "name": "Attributed origins",
+          "color": "#c98d6e"
+        },
+        {
+          "id": "target",
+          "name": "Major targets",
+          "color": "#8fae7e"
+        }
+      ],
+      "assignments": {
+        "RU": {
+          "roleId": "origin"
+        },
+        "KP": {
+          "roleId": "origin"
+        },
+        "CN": {
+          "roleId": "origin"
+        },
+        "IR": {
+          "roleId": "origin"
+        },
+        "IL": {
+          "roleId": "origin"
+        },
+        "US": {
+          "roleId": "target"
+        },
+        "UA": {
+          "roleId": "target"
+        },
+        "EE": {
+          "roleId": "target"
+        },
+        "GB": {
+          "roleId": "target"
+        },
+        "SA": {
+          "roleId": "target"
+        }
+      },
+      "flows": [
+        {
+          "id": "cy1",
+          "source": "RU",
+          "target": "EE",
+          "value": 12,
+          "year": 2007,
+          "color": null,
+          "reversed": false,
+          "note": "2007 Estonia DDoS — banks, ministries and media knocked offline for weeks; NATO founded its cyber defence centre in Tallinn in response.",
+          "citation": "NATO CCDCOE",
+          "waypoints": [],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy2",
+          "source": "IL",
+          "target": "IR",
+          "value": 18,
+          "year": 2010,
+          "color": null,
+          "reversed": false,
+          "note": "Stuxnet (2010), attributed to a US–Israel operation, physically sabotaged uranium-enrichment centrifuges at Natanz.",
+          "citation": "Symantec W32.Stuxnet dossier",
+          "waypoints": [],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy3",
+          "source": "KP",
+          "target": "US",
+          "value": 14,
+          "year": 2014,
+          "color": null,
+          "reversed": false,
+          "dir": "optimal",
+          "note": "Sony Pictures hack (2014), attributed by the FBI to North Korea’s Lazarus Group.",
+          "citation": "FBI statement, Dec 2014",
+          "waypoints": [
+            {
+              "longitude": 178,
+              "latitude": 35
+            }
+          ],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null
+        },
+        {
+          "id": "cy4",
+          "source": "KP",
+          "target": "GB",
+          "value": 15,
+          "year": 2017,
+          "color": null,
+          "reversed": false,
+          "note": "WannaCry ransomware (2017) infected 200,000+ machines in 150 countries, crippling NHS hospitals.",
+          "citation": "UK NCSC",
+          "waypoints": [
+            {
+              "longitude": 60,
+              "latitude": 55
+            }
+          ],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy5",
+          "source": "RU",
+          "target": "UA",
+          "value": 20,
+          "year": 2017,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "note": "NotPetya (2017) — a wiper disguised as ransomware, spread via Ukrainian tax software; ~$10B in global damages, the costliest cyberattack in history.",
+          "citation": "White House attribution, Feb 2018",
+          "waypoints": [],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy6",
+          "source": "RU",
+          "target": "US",
+          "value": 16,
+          "year": 2020,
+          "color": "#7d3b2d",
+          "reversed": false,
+          "note": "SolarWinds supply-chain compromise (2020) trojanised software updates, reaching nine US federal agencies.",
+          "citation": "CISA / joint agency statement",
+          "waypoints": [
+            {
+              "longitude": -30,
+              "latitude": 55
+            }
+          ],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy7",
+          "source": "IR",
+          "target": "SA",
+          "value": 13,
+          "year": 2012,
+          "color": null,
+          "reversed": false,
+          "note": "Shamoon (2012) wiped roughly 30,000 Saudi Aramco workstations.",
+          "citation": "Reuters investigation",
+          "waypoints": [],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null,
+          "dir": "auto"
+        },
+        {
+          "id": "cy8",
+          "source": "CN",
+          "target": "US",
+          "value": 12,
+          "year": 2015,
+          "color": null,
+          "reversed": false,
+          "dir": "optimal",
+          "note": "OPM breach (2015) exposed security-clearance records of 21.5 million US personnel.",
+          "citation": "US OPM",
+          "waypoints": [
+            {
+              "longitude": 178,
+              "latitude": 45
+            }
+          ],
+          "unit": "impact (relative)",
+          "sourcePos": null,
+          "targetPos": null
+        }
+      ],
+      "markers": [
+        {
+          "id": "cm1",
+          "type": "dot",
+          "label": "Morris worm, 1988",
+          "color": "#8b5e3c",
+          "longitude": -71.09,
+          "latitude": 42.36
+        },
+        {
+          "id": "cm2",
+          "type": "pin",
+          "label": "Natanz",
+          "color": "#7d3b2d",
+          "longitude": 51.72,
+          "latitude": 33.72
+        }
+      ],
+      "updatedAt": null
     }
-  ]
+  ],
+  "currentId": "coffee",
+  "dark": false
 }
